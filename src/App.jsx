@@ -39,13 +39,13 @@ export default function PrototipoCondominios() {
 
   const badge = (text, type) => {
     const styles = {
-      ok: "bg-green-100 text-green-700",
-      warn: "bg-yellow-100 text-yellow-700",
-      danger: "bg-red-100 text-red-700",
-      info: "bg-blue-100 text-blue-700",
-      gray: "bg-slate-100 text-slate-700",
+      ok: "bg-emerald-50 text-emerald-700 border border-emerald-100",
+      warn: "bg-amber-50 text-amber-700 border border-amber-100",
+      danger: "bg-red-50 text-red-700 border border-red-100",
+      info: "bg-blue-50 text-blue-700 border border-blue-100",
+      gray: "bg-slate-100 text-slate-700 border border-slate-200",
     };
-    return <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[type]}`}>{text}</span>;
+    return <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${styles[type]}`}>{text}</span>;
   };
 
   const menuItems = [
@@ -57,10 +57,14 @@ export default function PrototipoCondominios() {
   ];
 
   const Sidebar = () => (
-    <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-slate-900 text-white p-6">
+    <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-slate-950 text-white p-6 border-r border-white/5">
       <div className="mb-8">
-        <h1 className="text-xl font-bold">CondoGestion</h1>
-        <p className="text-sm text-slate-300">Panel administrativo</p>
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-slate-300 mb-4">
+          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          Sistema en línea
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">CondoGestion</h1>
+        <p className="text-sm text-slate-400 mt-1">Panel administrativo</p>
       </div>
 
       <nav className="space-y-2 text-sm">
@@ -68,16 +72,22 @@ export default function PrototipoCondominios() {
           <button
             key={item.key}
             onClick={() => setScreen(item.key)}
-            className={`w-full text-left rounded-2xl px-4 py-3 ${screen === item.key ? "bg-white/15 font-medium" : "hover:bg-white/10"}`}
+            className={`w-full text-left rounded-2xl px-4 py-3 transition ${screen === item.key ? "bg-gradient-to-r from-blue-700 to-slate-800 font-semibold shadow-lg shadow-blue-950/20" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
           >
             {item.label}
           </button>
         ))}
       </nav>
 
+      <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-4">
+        <p className="text-xs uppercase tracking-wide text-slate-400 mb-1">Resumen rápido</p>
+        <p className="text-2xl font-bold">86</p>
+        <p className="text-sm text-slate-300">usuarios activos esta semana</p>
+      </div>
+
       <button
         onClick={() => setScreen("login")}
-        className="mt-8 w-full rounded-2xl bg-white text-slate-900 px-4 py-3 text-sm font-medium"
+        className="mt-8 w-full rounded-2xl bg-white text-slate-900 px-4 py-3 text-sm font-semibold hover:bg-slate-100 transition"
       >
         Cerrar sesión
       </button>
@@ -88,15 +98,19 @@ export default function PrototipoCondominios() {
     <div className="min-h-screen bg-slate-100 text-slate-800">
       <div className="grid grid-cols-12 min-h-screen">
         <Sidebar />
-        <main className="col-span-12 md:col-span-9 lg:col-span-10 p-4 md:p-8">
-          <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <main className="col-span-12 md:col-span-9 lg:col-span-10 p-4 md:p-8 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_25%)]">
+          <header className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5 mb-8">
             <div>
-              <h2 className="text-3xl font-bold">{title}</h2>
-              <p className="text-slate-600 mt-1">{subtitle}</p>
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 mb-3">
+                <span className="h-2 w-2 rounded-full bg-blue-600" />
+                Vista de administración
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">{title}</h2>
+              <p className="text-slate-600 mt-2 max-w-2xl leading-7">{subtitle}</p>
             </div>
             <div className="flex gap-3 flex-wrap">
-              <button className="bg-white rounded-2xl px-4 py-2 shadow-sm">Exportar</button>
-              <button className="bg-slate-900 text-white rounded-2xl px-4 py-2 shadow-sm">Nueva acción</button>
+              <button className="bg-white rounded-2xl px-4 py-3 shadow-sm border border-slate-200 font-medium hover:shadow-md transition">Exportar</button>
+              <button className="bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-2xl px-5 py-3 shadow-lg shadow-blue-900/20 font-semibold hover:-translate-y-0.5 transition">Nueva acción</button>
             </div>
           </header>
           {children}
@@ -107,40 +121,105 @@ export default function PrototipoCondominios() {
 
   if (screen === "login") {
     return (
-      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-6">
-        <div className="w-full max-w-5xl grid md:grid-cols-2 bg-white rounded-3xl shadow-xl overflow-hidden">
-          <div className="bg-slate-900 text-white p-10 flex flex-col justify-center">
-            <h1 className="text-4xl font-bold mb-4">CondoGestion</h1>
-            <p className="text-slate-300 text-base leading-7">
-              Plataforma web para la gestión digital de condominios y edificios residenciales.
-            </p>
-            <div className="mt-8 space-y-3 text-sm text-slate-300">
-              <p>• Control de pagos y morosidad</p>
-              <p>• Registro y seguimiento de incidencias</p>
-              <p>• Comunicados centralizados</p>
-              <p>• Dashboard administrativo</p>
+      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.20),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.18),_transparent_25%)]" />
+        <div className="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+        <div className="absolute -bottom-24 -right-12 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
+
+        <div className="relative min-h-screen flex items-center justify-center p-6 md:p-10">
+          <div className="w-full max-w-6xl grid lg:grid-cols-[1.1fr_0.9fr] rounded-[32px] overflow-hidden border border-white/10 shadow-[0_20px_80px_rgba(15,23,42,0.45)] bg-white/5 backdrop-blur-xl">
+            <div className="relative p-8 md:p-12 lg:p-14 text-white bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950">
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.04),transparent_40%,rgba(59,130,246,0.08))]" />
+              <div className="relative">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium tracking-wide text-slate-200 mb-8">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  Plataforma residencial inteligente
+                </div>
+
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight mb-5">CondoGestion</h1>
+                <p className="text-slate-300 text-base md:text-lg leading-8 max-w-xl">
+                  Una experiencia moderna para administrar pagos, incidencias, comunicados y residentes en un solo lugar.
+                </p>
+
+                <div className="grid sm:grid-cols-2 gap-4 mt-10">
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                    <p className="text-3xl font-bold">78%</p>
+                    <p className="text-sm text-slate-300 mt-1">Pagos al día este mes</p>
+                  </div>
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                    <p className="text-3xl font-bold">12</p>
+                    <p className="text-sm text-slate-300 mt-1">Incidencias activas</p>
+                  </div>
+                </div>
+
+                <div className="mt-10 grid gap-4">
+                  {[
+                    "Control de pagos y morosidad en tiempo real",
+                    "Seguimiento de incidencias con prioridad y estado",
+                    "Comunicados centralizados para residentes",
+                    "Dashboard con métricas y acciones rápidas",
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                      <div className="mt-1 h-2.5 w-2.5 rounded-full bg-cyan-400" />
+                      <p className="text-sm text-slate-200">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="p-10 flex flex-col justify-center">
-            <h2 className="text-2xl font-bold mb-2">Iniciar sesión</h2>
-            <p className="text-slate-500 mb-8">Ingrese sus credenciales para acceder al sistema</p>
+            <div className="bg-white/95 px-6 py-8 md:px-10 md:py-12 lg:px-12 lg:py-14">
+              <div className="max-w-md mx-auto">
+                <div className="mb-8">
+                  <p className="text-sm font-medium text-blue-700 mb-2">Bienvenido de nuevo</p>
+                  <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Iniciar sesión</h2>
+                  <p className="text-slate-500 mt-2 leading-7">
+                    Accede al panel de administración y gestiona tu condominio con una interfaz clara, moderna e intuitiva.
+                  </p>
+                </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Correo electrónico</label>
-                <input className="w-full border rounded-2xl px-4 py-3" placeholder="admin@condominio.com" />
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Correo electrónico</label>
+                    <div className="group flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 hover:border-slate-300">
+                      <span className="mr-3 text-slate-400">@</span>
+                      <input className="w-full bg-transparent outline-none placeholder:text-slate-400 text-slate-800" placeholder="admin@condominio.com" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-semibold text-slate-700">Contraseña</label>
+                      <button className="text-xs font-medium text-blue-700 hover:text-blue-800">¿Olvidaste tu contraseña?</button>
+                    </div>
+                    <div className="group flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-100 hover:border-slate-300">
+                      <span className="mr-3 text-slate-400">*</span>
+                      <input type="password" className="w-full bg-transparent outline-none placeholder:text-slate-400 text-slate-800" placeholder="********" />
+                      <button className="ml-3 rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-200">Ver</button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <label className="flex items-center gap-2 text-slate-600">
+                      <input type="checkbox" className="rounded border-slate-300" />
+                      Recordarme
+                    </label>
+                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 font-medium">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                      Sistema activo
+                    </span>
+                  </div>
+
+                  <button onClick={() => setScreen("dashboard")} className="w-full rounded-2xl bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 px-5 py-4 text-white font-semibold shadow-lg shadow-blue-900/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl">
+                    Ingresar al panel
+                  </button>
+                </div>
+
+                <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-semibold text-slate-800 mb-1">Acceso de demostración</p>
+                  <p className="text-sm text-slate-500">Este login es un prototipo funcional para mostrar navegación, experiencia visual y arquitectura del sistema.</p>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">Contraseña</label>
-                <input type="password" className="w-full border rounded-2xl px-4 py-3" placeholder="********" />
-              </div>
-              <button
-                onClick={() => setScreen("dashboard")}
-                className="w-full bg-slate-900 text-white rounded-2xl py-3 font-medium"
-              >
-                Ingresar
-              </button>
             </div>
           </div>
         </div>
@@ -150,22 +229,24 @@ export default function PrototipoCondominios() {
 
   if (screen === "dashboard") {
     return (
-      <Layout
-        title="Dashboard General"
-        subtitle="Resumen de pagos, incidencias, comunicados y actividad del condominio"
-      >
+      <Layout title="Dashboard General" subtitle="Resumen de pagos, incidencias, comunicados y actividad del condominio">
         <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
           {stats.map((item) => (
-            <div key={item.label} className="bg-white rounded-2xl shadow-sm p-5">
-              <p className="text-sm text-slate-500">{item.label}</p>
-              <p className="text-3xl font-bold mt-2">{item.value}</p>
-              <p className="text-sm text-slate-500 mt-1">{item.sub}</p>
+            <div key={item.label} className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5 hover:shadow-md transition">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-slate-500">{item.label}</p>
+                  <p className="text-3xl font-bold mt-2 tracking-tight">{item.value}</p>
+                </div>
+                <div className="h-11 w-11 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-700 font-bold">•</div>
+              </div>
+              <p className="text-sm text-slate-500 mt-3">{item.sub}</p>
             </div>
           ))}
         </section>
 
         <section className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm p-5">
+          <div className="xl:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/70 p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Estado de pagos</h3>
               {badge("Actualizado hoy", "info")}
@@ -198,12 +279,12 @@ export default function PrototipoCondominios() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-5">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-6">
             <h3 className="text-lg font-semibold mb-4">Comunicados recientes</h3>
             <div className="space-y-3">
               {comunicados.map((c, idx) => (
-                <div key={idx} className="bg-slate-50 rounded-2xl p-4 text-sm">
-                  <p className="font-medium">{c.titulo}</p>
+                <div key={idx} className="bg-slate-50 rounded-2xl p-4 text-sm border border-slate-200/70">
+                  <p className="font-medium text-slate-800">{c.titulo}</p>
                   <p className="text-slate-500 mt-1">{c.detalle}</p>
                 </div>
               ))}
@@ -217,21 +298,21 @@ export default function PrototipoCondominios() {
   if (screen === "pagos") {
     return (
       <Layout title="Módulo de Pagos" subtitle="Control de cuotas, pagos realizados y morosidad de residentes">
-        <div className="bg-white rounded-2xl shadow-sm p-5 mb-6">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input className="border rounded-2xl px-4 py-3" placeholder="Buscar residente" />
-            <select className="border rounded-2xl px-4 py-3">
+            <input className="border border-slate-200 rounded-2xl px-4 py-3 bg-white" placeholder="Buscar residente" />
+            <select className="border border-slate-200 rounded-2xl px-4 py-3 bg-white">
               <option>Todos los estados</option>
               <option>Pagado</option>
               <option>Pendiente</option>
               <option>Vencido</option>
             </select>
-            <input className="border rounded-2xl px-4 py-3" placeholder="Mes" />
-            <button className="bg-slate-900 text-white rounded-2xl px-4 py-3">Registrar pago</button>
+            <input className="border border-slate-200 rounded-2xl px-4 py-3 bg-white" placeholder="Mes" />
+            <button className="bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-2xl px-4 py-3 font-semibold">Registrar pago</button>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-5">
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -254,7 +335,7 @@ export default function PrototipoCondominios() {
                       {p.estado === "Vencido" && badge(p.estado, "danger")}
                     </td>
                     <td className="py-3 font-medium">{p.monto}</td>
-                    <td className="py-3"><button className="text-sm bg-slate-100 px-3 py-2 rounded-xl">Ver detalle</button></td>
+                    <td className="py-3"><button className="text-sm bg-slate-100 px-3 py-2 rounded-xl font-medium">Ver detalle</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -269,11 +350,11 @@ export default function PrototipoCondominios() {
     return (
       <Layout title="Módulo de Incidencias" subtitle="Registro, seguimiento y estado de reclamos o problemas del condominio">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm p-5">
+          <div className="xl:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5">
             <h3 className="text-lg font-semibold mb-4">Incidencias registradas</h3>
             <div className="space-y-3">
               {incidencias.map((i) => (
-                <div key={i.id} className="border rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div key={i.id} className="border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-slate-50/60">
                   <div>
                     <p className="font-semibold">{i.id} - {i.titulo}</p>
                     <p className="text-sm text-slate-500">Prioridad: {i.prioridad}</p>
@@ -286,18 +367,18 @@ export default function PrototipoCondominios() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-5">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5">
             <h3 className="text-lg font-semibold mb-4">Registrar incidencia</h3>
             <div className="space-y-4">
-              <input className="w-full border rounded-2xl px-4 py-3" placeholder="Título" />
-              <select className="w-full border rounded-2xl px-4 py-3">
+              <input className="w-full border border-slate-200 rounded-2xl px-4 py-3" placeholder="Título" />
+              <select className="w-full border border-slate-200 rounded-2xl px-4 py-3">
                 <option>Seleccionar prioridad</option>
                 <option>Alta</option>
                 <option>Media</option>
                 <option>Baja</option>
               </select>
-              <textarea className="w-full border rounded-2xl px-4 py-3 h-32" placeholder="Descripción"></textarea>
-              <button className="w-full bg-slate-900 text-white rounded-2xl py-3">Guardar incidencia</button>
+              <textarea className="w-full border border-slate-200 rounded-2xl px-4 py-3 h-32" placeholder="Descripción"></textarea>
+              <button className="w-full bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-2xl py-3 font-semibold">Guardar incidencia</button>
             </div>
           </div>
         </div>
@@ -309,11 +390,11 @@ export default function PrototipoCondominios() {
     return (
       <Layout title="Módulo de Comunicados" subtitle="Gestión de avisos y mensajes dirigidos a los residentes">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm p-5">
+          <div className="xl:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5">
             <h3 className="text-lg font-semibold mb-4">Comunicados emitidos</h3>
             <div className="space-y-4">
               {comunicados.map((c, idx) => (
-                <div key={idx} className="border rounded-2xl p-4">
+                <div key={idx} className="border border-slate-200 rounded-2xl p-4 bg-slate-50/60">
                   <p className="font-semibold">{c.titulo}</p>
                   <p className="text-slate-500 mt-1">{c.detalle}</p>
                   <div className="mt-3">{badge("Publicado", "ok")}</div>
@@ -322,12 +403,12 @@ export default function PrototipoCondominios() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-5">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5">
             <h3 className="text-lg font-semibold mb-4">Nuevo comunicado</h3>
             <div className="space-y-4">
-              <input className="w-full border rounded-2xl px-4 py-3" placeholder="Asunto" />
-              <textarea className="w-full border rounded-2xl px-4 py-3 h-36" placeholder="Contenido del comunicado"></textarea>
-              <button className="w-full bg-slate-900 text-white rounded-2xl py-3">Publicar comunicado</button>
+              <input className="w-full border border-slate-200 rounded-2xl px-4 py-3" placeholder="Asunto" />
+              <textarea className="w-full border border-slate-200 rounded-2xl px-4 py-3 h-36" placeholder="Contenido del comunicado"></textarea>
+              <button className="w-full bg-gradient-to-r from-slate-900 to-blue-900 text-white rounded-2xl py-3 font-semibold">Publicar comunicado</button>
             </div>
           </div>
         </div>
@@ -337,7 +418,7 @@ export default function PrototipoCondominios() {
 
   return (
     <Layout title="Módulo de Residentes" subtitle="Consulta general de usuarios, departamentos y estado dentro del sistema">
-      <div className="bg-white rounded-2xl shadow-sm p-5">
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-5">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -354,7 +435,7 @@ export default function PrototipoCondominios() {
                   <td className="py-3">{r.nombre}</td>
                   <td className="py-3">{r.depto}</td>
                   <td className="py-3">{r.estado === "Activo" ? badge(r.estado, "ok") : badge(r.estado, "warn")}</td>
-                  <td className="py-3"><button className="text-sm bg-slate-100 px-3 py-2 rounded-xl">Ver perfil</button></td>
+                  <td className="py-3"><button className="text-sm bg-slate-100 px-3 py-2 rounded-xl font-medium">Ver perfil</button></td>
                 </tr>
               ))}
             </tbody>
