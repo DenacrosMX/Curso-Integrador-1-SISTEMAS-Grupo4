@@ -179,7 +179,7 @@ export default function PrototipoCondominios() {
                 Plataforma residencial inteligente
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">CondoGestion</h1>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">HabiTech</h1>
               <p className="text-slate-300 text-base md:text-lg leading-8 max-w-xl mb-8">
                 Administra pagos, incidencias, comunicados y residentes desde una experiencia moderna, clara y ordenada.
               </p>
