@@ -101,7 +101,7 @@ export default function PrototipoCondominios() {
           <span className="h-2 w-2 rounded-full bg-emerald-400" />
           Sistema en línea
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">CondoGestion</h1>
+        <h1 className="text-2xl font-bold tracking-tight">HabiTech</h1>
         <p className="text-sm text-slate-400 mt-1">Panel administrativo</p>
       </div>
 
