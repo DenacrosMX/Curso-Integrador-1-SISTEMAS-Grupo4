@@ -23,7 +23,7 @@ Tambien existe una estructura React en la raiz del repositorio, pero la funciona
 ```text
 .
 |-- Base de Datos/
-|   `-- habitech2.0.sql
+|   `-- habitech.sql
 |-- habitech/
 |   |-- pom.xml
 |   |-- logs/
@@ -175,7 +175,7 @@ Tabla:
 El script principal se encuentra en:
 
 ```text
-Base de Datos/habitech2.0.sql
+Base de Datos/habitech.sql
 ```
 
 Nombre de base de datos usado por la aplicacion:
@@ -245,14 +245,14 @@ createdb -U postgres habitech_db
 Luego ejecutar el script:
 
 ```bash
-psql -U postgres -d habitech_db -f "Base de Datos/habitech2.0.sql"
+psql -U postgres -d habitech_db -f "Base de Datos/habitech.sql"
 ```
 
 Si se usa pgAdmin:
 
 1. Crear una base llamada `habitech_db`.
 2. Abrir Query Tool.
-3. Cargar y ejecutar el contenido de `Base de Datos/habitech2.0.sql`.
+3. Cargar y ejecutar el contenido de `Base de Datos/habitech.sql`.
 
 ### 8.3 Compilar
 
