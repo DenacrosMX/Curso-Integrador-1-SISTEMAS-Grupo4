@@ -1,0 +1,246 @@
+/* ==========================================================================
+   MÓDULO 2 - GESTIÓN DE INMUEBLES PANORÁMICO
+   ========================================================================== */
+
+.modulo-inmuebles .titulo-modulo {
+    color: #1e293b !important;
+    font-size: 25px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+}
+
+.modulo-inmuebles .descripcion-modulo {
+    color: #475569;
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.modulo-inmuebles {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* CARD ASISTENTE DE CONFIGURACIÓN */
+.card-asistente {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 992px) {
+    .card-asistente {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .asistente-info { flex: 1; }
+    .asistente-acciones { display: flex; gap: 12px; align-items: center; }
+}
+
+.asistente-info h3 {
+    margin: 0 0 6px 0;
+    color: #f8fafc;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.asistente-info p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.form-inline-asistente {
+    display: flex;
+    gap: 10px;
+}
+
+.select-maestro {
+    padding: 10px 14px;
+    background: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    color: #f1f5f9;
+    font-size: 13.5px;
+    min-width: 280px;
+}
+
+.btn-asistente-generar {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 13.5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.btn-asistente-generar:hover { background: #059669; }
+
+.btn-asistente-limpiar {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 13.5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.btn-asistente-limpiar:hover { background: #dc2626; }
+
+/* SECCIÓN INVENTARIO Y REJILLA (GRID) */
+.card-inventario {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card-inventario h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #1e293b;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
+    text-transform: uppercase;
+}
+
+/* Grid dinámico responsivo */
+.grid-inmuebles-panoramico {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    width: 100%;
+}
+
+/* TARJETAS DE UNIDADES INDIVIDUALES */
+.tarjeta-inmueble {
+    border-radius: 8px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 120px;
+    box-sizing: border-box;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid;
+}
+
+.tarjeta-inmueble:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+/* Colores diferenciadores por Tipo de Inmueble */
+.tarjeta-inmueble.tipo-dpto {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+.tarjeta-inmueble.tipo-cochera {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+/* Encabezado Interno */
+.tarjeta-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.badge-torre {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    background: #e2e8f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.badge-estado {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.badge-estado.estado-vacante { background: #dcfce7; color: #15803d; }
+.badge-estado.estado-ocupado { background: #fee2e2; color: #b91c1c; }
+
+/* Cuerpo Interno */
+.tarjeta-cuerpo {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.tarjeta-cuerpo .nro-unidad {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.tarjeta-cuerpo .detalle-unidad {
+    margin: 3px 0 0 0;
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* Pie Interno */
+.tarjeta-pie {
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 6px;
+    text-align: left;
+}
+
+.tipo-texto {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+}
+
+/* CONTENEDOR ESTADO VACÍO (SIN INMUEBLES) */
+.inventario-vacio-box {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+}
+
+.icono-vacio { font-size: 40px; margin-bottom: 12px; }
+.inventario-vacio-box h4 { margin: 0 0 6px 0; color: #1e293b; font-size: 16px; }
+.inventario-vacio-box p { margin: 0; color: #64748b; font-size: 13px; max-width: 460px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+/* ALERTAS DE SISTEMA */
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+.alert-success { background: #14532d; color: #bbf7d0; border-left: 4px solid #22c55e; }
+.alert-danger { background: #7f1d1d; color: #fecaca; border-left: 4px solid #ef4444; }

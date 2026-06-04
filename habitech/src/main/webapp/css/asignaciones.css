@@ -1,0 +1,65 @@
+.modulo-asignaciones {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.modulo-asignaciones .titulo-modulo { color: #1e293b; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.modulo-asignaciones .descripcion-modulo { color: #64748b; font-size: 13.5px; margin: 0; }
+
+.bloque-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+@media (min-width: 992px) {
+    .bloque-split { grid-template-columns: 350px 1fr; }
+}
+
+.card-formulario, .card-tabla-datos {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.card-formulario h3, .card-tabla-datos h3 {
+    margin-top: 0; margin-bottom: 16px; font-size: 14px; color: #1e293b;
+    border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; text-transform: uppercase;
+}
+
+.form-habitech { display: flex; flex-direction: column; gap: 14px; }
+.grupo-campo { display: flex; flex-direction: column; gap: 5px; }
+.grupo-campo label { font-size: 12.5px; font-weight: 600; color: #475569; }
+
+.input-control {
+    padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;
+    font-size: 13px; color: #1e293b; background: #f8fafc; outline: none;
+}
+.input-control:focus { border-color: #3b82f6; background: #fff; }
+
+.btn-guardar-asignacion {
+    background: #2563eb; color: white; border: none; padding: 11px;
+    font-weight: 600; font-size: 13px; border-radius: 6px; cursor: pointer;
+    transition: background 0.2s; margin-top: 6px;
+}
+.btn-guardar-asignacion:hover { background: #1d4ed8; }
+
+/* TABLA ESTILOS */
+.table-container { overflow-x: auto; }
+.tabla-habitech { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+.tabla-habitech th { background: #f8fafc; color: #64748b; padding: 12px; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+.tabla-habitech td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+
+.badge-tipo-un { background: #e0f2fe; color: #0369a1; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+.badge-regimen { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+.badge-regimen.reg-prop { background: #fef3c7; color: #d97706; }
+.badge-regimen.reg-inq { background: #e0e7ff; color: #4f46e5; }
+
+.btn-tabla-eliminar {
+    background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;
+    padding: 4px 8px; font-size: 11.5px; font-weight: 600; border-radius: 4px;
+    cursor: pointer; transition: background 0.2s;
+}
+.btn-tabla-eliminar:hover { background: #fca5a5; }

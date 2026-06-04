@@ -1,0 +1,21 @@
+.modulo-recibos { font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; gap: 20px; }
+.modulo-recibos .titulo-modulo { color: #1e293b; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.modulo-recibos .descripcion-modulo { color: #64748b; font-size: 13.5px; margin: 0; }
+
+.btn-procesar-cobro {
+    background: #10b981; color: white; border: none; padding: 11px;
+    font-weight: 600; font-size: 13px; border-radius: 6px; cursor: pointer;
+    transition: background 0.2s; margin-top: 6px;
+}
+.btn-procesar-cobro:hover { background: #059669; }
+
+.badge-estado-pago { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+.badge-estado-pago.pago-pen { background: #fef3c7; color: #d97706; }
+.badge-estado-pago.pago-pag { background: #dcfce7; color: #15803d; }
+
+.btn-tabla-pagar {
+    background: #2563eb; color: white; border: none; padding: 5px 10px;
+    font-size: 11.5px; font-weight: 600; border-radius: 4px; cursor: pointer;
+}
+.btn-tabla-pagar:hover { background: #1d4ed8; }
+.text-conciliado { color: #94a3b8; font-size: 12px; font-weight: 600; }
