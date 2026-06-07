@@ -1,0 +1,134 @@
+.modulo-usuarios {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.modulo-usuarios .header-modulo {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+.modulo-usuarios .titulo-modulo {
+    color: #0f172a;
+    font-size: 24px;
+    margin: 0;
+}
+.modulo-usuarios .descripcion-modulo {
+    color: #64748b;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+/* Layout */
+.bloque-split {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+}
+.card-formulario {
+    flex: 1;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+.card-tabla-datos {
+    flex: 2.2;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* Formulario */
+.form-habitech {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.grupo-campo label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+}
+.input-control {
+    padding: 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    font-size: 13.5px;
+    outline: none;
+    background-color: #f8fafc;
+}
+.input-control:focus {
+    border-color: #6366f1;
+    background-color: #fff;
+}
+
+.btn-registrar-usuario {
+    background: #6366f1;
+    color: white;
+    border: none;
+    padding: 11px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 5px;
+}
+.btn-registrar-usuario:hover { background: #4f46e5; }
+
+/* Tabla */
+.table-container { overflow-x: auto; }
+.tabla-habitech { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tabla-habitech th { background: #f8fafc; color: #64748b; text-align: left; padding: 12px; border-bottom: 2px solid #e2e8f0; }
+.tabla-habitech td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+
+.contacto-box {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 11.5px;
+    color: #475569;
+}
+
+.badge-hash {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    border: 1px dashed #cbd5e1;
+}
+
+/* Badges RBAC */
+.badge-rol { font-size: 10.5px; padding: 3px 7px; border-radius: 4px; font-weight: 700; display: inline-block; }
+.badge-rol.rol-admin_sistema { background: #fee2e2; color: #991b1b; }
+.badge-rol.rol-conserje { background: #e0f2fe; color: #0369a1; }
+.badge-rol.rol-residente { background: #dcfce7; color: #166534; }
+
+.badge-estado { font-size: 11px; padding: 3px 6px; border-radius: 4px; font-weight: 600; }
+.badge-estado.est-activo { background: #dcfce7; color: #15803d; }
+.badge-estado.est-inactivo { background: #f1f5f9; color: #94a3b8; }
+
+/* Botón Control */
+.btn-toggle-status {
+    border: none;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+}
+.btn-toggle-status.desactivar { background: #f97316; }
+.btn-toggle-status.desactivar:hover { background: #ea580c; }
+.btn-toggle-status.activar { background: #10b981; }
+.btn-toggle-status.activar:hover { background: #059669; }

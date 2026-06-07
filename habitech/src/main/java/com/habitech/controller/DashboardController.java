@@ -7,6 +7,7 @@ import com.habitech.dao.ReciboDAO;
 import com.habitech.dao.VisitaDAO;
 import com.habitech.dao.IncidenciaDAO;
 import com.habitech.dao.ReservaDAO; // Importación Módulo 8: Reservas
+import com.habitech.dao.UsuarioDAO; // Importación Módulo 3: Usuarios
 import com.habitech.dao.impl.AsignacionDAOImpl;
 import com.habitech.dao.impl.InmuebleDAOImpl;
 import com.habitech.dao.impl.MaestroDAOImpl;
@@ -14,6 +15,7 @@ import com.habitech.dao.impl.ReciboDAOImpl;
 import com.habitech.dao.impl.VisitaDAOImpl;
 import com.habitech.dao.impl.IncidenciaDAOImpl;
 import com.habitech.dao.impl.ReservaDAOImpl; // Importación Módulo 8: Reservas
+import com.habitech.dao.impl.UsuarioDAOImpl; // Importación Módulo 3: Usuarios
 import com.habitech.model.InmuebleModel;
 import com.habitech.model.MaestroModel;
 import com.habitech.model.AsignacionModel;
@@ -21,6 +23,7 @@ import com.habitech.model.ReciboModel;
 import com.habitech.model.VisitaModel;
 import com.habitech.model.IncidenciaModel;
 import com.habitech.model.ReservaModel; // Importación Módulo 8: Reservas
+import com.habitech.model.UsuarioModel; // Importación Módulo 3: Usuarios
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,6 +39,7 @@ public class DashboardController extends HttpServlet {
     private final VisitaDAO visitaDAO = new VisitaDAOImpl();
     private final IncidenciaDAO incidenciaDAO = new IncidenciaDAOImpl();
     private final ReservaDAO reservaDAO = new ReservaDAOImpl(); // Instancia de Reservas (Módulo 8)
+    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl(); // Instancia de Usuarios (Módulo 3)
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -113,6 +117,12 @@ public class DashboardController extends HttpServlet {
             // 2. Cargar el padrón de inmuebles para identificar a la unidad solicitante
             List<InmuebleModel> listaInmueblesSolicitantes = visitaDAO.listarTodosLosInmuebles();
             request.setAttribute("listaInmueblesSolicitantes", listaInmueblesSolicitantes);
+
+        } else if ("usuarios".equals(view)) {
+            // INTEGRACIÓN MÓDULO 3 (RBAC): GESTIÓN DE USUARIOS Y ROLES
+            // 1. Cargar el listado completo de operadores y residentes registrados
+            List<UsuarioModel> listaUsuarios = usuarioDAO.listarUsuarios();
+            request.setAttribute("listaUsuarios", listaUsuarios);
         }
 
         request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
