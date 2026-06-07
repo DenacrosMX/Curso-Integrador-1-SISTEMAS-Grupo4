@@ -57,3 +57,47 @@ CREATE TABLE recibos (
     -- Evita duplicar el cobro del mismo mes
     CONSTRAINT uq_recibo_periodo UNIQUE (asignacion_id, mes_facturado, anio_facturado) 
 );
+
+-- Tabla: visitas
+CREATE TABLE visitas (
+    id SERIAL PRIMARY KEY,
+    inmueble_id INT NOT NULL,
+    conserje_id INT,
+    nombre_visitante VARCHAR(100) NOT NULL,
+    dni_visitante VARCHAR(15) NOT NULL,
+    placa_vehiculo VARCHAR(15),
+    tipo_ingreso VARCHAR(30) NOT NULL CHECK (tipo_ingreso IN ('VISITA', 'DELIVERY', 'SERVICIO_TECNICO')),
+    fecha_hora_ingreso TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_hora_out TIMESTAMP,
+    estado VARCHAR(20) NOT NULL DEFAULT 'EN_CURSO' CHECK (estado IN ('EN_CURSO', 'FINALIZADO')),
+
+    CONSTRAINT fk_visita_inmueble FOREIGN KEY (inmueble_id) REFERENCES inmuebles(id) ON DELETE CASCADE
+);
+
+-- Tabla: incidencias
+CREATE TABLE incidencias (
+    id SERIAL PRIMARY KEY,
+    inmueble_id INT NOT NULL,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    prioridad VARCHAR(20) NOT NULL CHECK (prioridad IN ('BAJA', 'MEDIA', 'ALTA')),
+    estado VARCHAR(20) NOT NULL DEFAULT 'ABIERTO' CHECK (estado IN ('ABIERTO', 'EN_PROCESO', 'RESUELTO')),
+    fecha_reporte TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_cierre TIMESTAMP,
+    conserje_id INT,
+
+    CONSTRAINT fk_incidencia_inmueble FOREIGN KEY (inmueble_id) REFERENCES inmuebles(id) ON DELETE CASCADE
+);
+
+-- Tabla: reservas
+CREATE TABLE reservas (
+    id SERIAL PRIMARY KEY,
+    inmueble_id INT NOT NULL,
+    area_comun VARCHAR(30) NOT NULL CHECK (area_comun IN ('PARRILLA', 'SALON_EVENTOS', 'GIMNASIO')),
+    fecha_reserva DATE NOT NULL,
+    turno VARCHAR(20) NOT NULL CHECK (turno IN ('MAÑANA', 'NOCHE')),
+    fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_reserva_inmueble FOREIGN KEY (inmueble_id) REFERENCES inmuebles(id) ON DELETE CASCADE,
+    CONSTRAINT uq_reserva_horario UNIQUE (area_comun, fecha_reserva, turno)
+);

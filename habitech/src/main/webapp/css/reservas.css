@@ -1,0 +1,153 @@
+.modulo-reservas {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.modulo-reservas .header-modulo {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+.modulo-reservas .titulo-modulo {
+    color: #0f172a;
+    font-size: 24px;
+    margin: 0;
+}
+.modulo-reservas .descripcion-modulo {
+    color: #64748b;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+/* Layout Split */
+.bloque-split {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+}
+.card-formulario {
+    flex: 1;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+.card-tabla-datos {
+    flex: 2;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* Formulario */
+.form-habitech {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.grupo-campo label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+.input-control {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #f8fafc;
+}
+.input-control:focus {
+    border-color: #059669;
+    background-color: #fff;
+}
+
+.btn-registrar-reserva {
+    background: #059669;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 5px;
+}
+.btn-registrar-reserva:hover {
+    background: #047857;
+}
+
+/* Tabla de Agenda */
+.table-container {
+    overflow-x: auto;
+}
+.tabla-habitech {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.tabla-habitech th {
+    background: #f8fafc;
+    color: #64748b;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+.tabla-habitech td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.fecha-destacada {
+    font-weight: 600;
+    color: #0f172a;
+}
+.text-muted {
+    color: #64748b;
+}
+
+/* Badges Temáticos */
+.badge-area {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+.badge-area.area-parrilla { background: #ffedd5; color: #c2410c; }
+.badge-area.area-salon_eventos { background: #f3e8ff; color: #6b21a8; }
+.badge-area.area-gimnasio { background: #e0f2fe; color: #0369a1; }
+
+.badge-turno {
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.badge-turno.turno-mañana { background: #fef9c3; color: #713f12; border: 1px solid #fef08a; }
+.badge-turno.turno-noche { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+
+.btn-cancelar-reserva {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-cancelar-reserva:hover {
+    background: #b91c1c;
+}

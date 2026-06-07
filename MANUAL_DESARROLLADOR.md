@@ -77,6 +77,9 @@ Valores principales de `view`:
 - `inmuebles`
 - `asignaciones`
 - `recibos`
+- `visitas`
+- `mesa_ayuda`
+- `reservas`
 
 ### Maestro
 
@@ -170,6 +173,78 @@ Tabla:
 
 - `recibos`
 
+### Control de visitas
+
+Controlador:
+
+- `VisitaController`
+
+Ruta:
+
+- `POST /visitas`
+
+Acciones:
+
+- `action=ingreso`: registra el ingreso de un visitante.
+- `action=darSalida`: registra la salida y finaliza la visita.
+
+DAO:
+
+- `VisitaDAO`
+- `VisitaDAOImpl`
+
+Tabla:
+
+- `visitas`
+
+### Mesa de ayuda
+
+Controlador:
+
+- `IncidenciaController`
+
+Ruta:
+
+- `POST /incidencias`
+
+Acciones:
+
+- `action=reportar`: registra una nueva incidencia.
+- `action=cambiarEstado`: actualiza el estado del ticket.
+
+DAO:
+
+- `IncidenciaDAO`
+- `IncidenciaDAOImpl`
+
+Tabla:
+
+- `incidencias`
+
+### Reservas
+
+Controlador:
+
+- `ReservaController`
+
+Ruta:
+
+- `POST /reservas`
+
+Acciones:
+
+- `action=reservar`: registra una reserva de area comun.
+- `action=cancelar`: elimina una reserva.
+
+DAO:
+
+- `ReservaDAO`
+- `ReservaDAOImpl`
+
+Tabla:
+
+- `reservas`
+
 ## 6. Base de datos
 
 El script principal se encuentra en:
@@ -190,11 +265,17 @@ Tablas:
 - `inmuebles`
 - `asignaciones`
 - `recibos`
+- `visitas`
+- `incidencias`
+- `reservas`
 
 ### Relaciones
 
 - `asignaciones.inmueble_id` referencia a `inmuebles.id`.
 - `recibos.asignacion_id` referencia a `asignaciones.id`.
+- `visitas.inmueble_id` referencia a `inmuebles.id`.
+- `incidencias.inmueble_id` referencia a `inmuebles.id`.
+- `reservas.inmueble_id` referencia a `inmuebles.id`.
 
 ### Restricciones importantes
 
@@ -202,8 +283,14 @@ Tablas:
 - `inmuebles.estado_ocupacion`: solo permite `VACANTE` u `OCUPADO`.
 - `asignaciones.tipo_adquisicion`: solo permite `PROPIETARIO` o `INQUILINO`.
 - `recibos.estado_pago`: solo permite `PENDIENTE` o `PAGADO`.
+- `visitas.tipo_ingreso`: solo permite `VISITA`, `DELIVERY` o `SERVICIO_TECNICO`.
+- `visitas.estado`: solo permite `EN_CURSO` o `FINALIZADO`.
+- `incidencias.prioridad`: solo permite `BAJA`, `MEDIA` o `ALTA`.
+- `incidencias.estado`: solo permite `ABIERTO`, `EN_PROCESO` o `RESUELTO`.
+- `reservas.area_comun`: solo permite `PARRILLA`, `SALON_EVENTOS` o `GIMNASIO`.
 - Un inmueble no puede tener mas de una asignacion activa.
 - Un recibo no puede duplicarse para la misma asignacion, mes y anio.
+- Una reserva no puede duplicarse para la misma area comun, fecha y turno.
 
 ## 7. Configuracion de conexion
 
@@ -321,6 +408,27 @@ http://localhost:8080/habitech/dashboard
 2. `ReciboController` recibe el `idRecibo`.
 3. `ReciboDAOImpl.cambiarEstadoPago` actualiza el estado a `PAGADO`.
 
+### Control de visitas
+
+1. El usuario registra un visitante desde `dashboard?view=visitas`.
+2. `VisitaController` recibe la accion `ingreso`.
+3. `VisitaDAOImpl.registrarIngreso` inserta la visita con estado inicial `EN_CURSO`.
+4. Cuando se registra la salida, `registrarSalida` actualiza `fecha_hora_out` y estado `FINALIZADO`.
+
+### Mesa de ayuda
+
+1. El usuario reporta una incidencia desde `dashboard?view=mesa_ayuda`.
+2. `IncidenciaController` recibe la accion `reportar`.
+3. `IncidenciaDAOImpl.registrarIncidencia` inserta el ticket con estado `ABIERTO`.
+4. La accion `cambiarEstado` permite pasar el ticket a `EN_PROCESO` o `RESUELTO`.
+
+### Reservas
+
+1. El usuario registra una reserva desde `dashboard?view=reservas`.
+2. `ReservaController` valida disponibilidad con `verificarDisponibilidad`.
+3. `ReservaDAOImpl.registrarReserva` inserta la reserva.
+4. La accion `cancelar` elimina la reserva seleccionada.
+
 ## 10. Vistas y estilos
 
 Vistas:
@@ -330,6 +438,9 @@ Vistas:
 - `inmuebles.jsp`
 - `asignaciones.jsp`
 - `recibos.jsp`
+- `visitas.jsp`
+- `mesa_ayuda.jsp`
+- `reservas.jsp`
 
 Estilos:
 
@@ -338,6 +449,9 @@ Estilos:
 - `inmuebles.css`
 - `asignaciones.css`
 - `recibos.css`
+- `visitas.css`
+- `mesa_ayuda.css`
+- `reservas.css`
 
 `dashboard.jsp` carga estilos por modulo segun el valor del parametro `view`.
 
@@ -364,6 +478,9 @@ Estilos:
 9. Registrar pago de un recibo pendiente.
 10. Verificar que el estado cambia a `PAGADO`.
 11. Liberar una asignacion y confirmar que el inmueble vuelve a `VACANTE`.
+12. Registrar una visita y luego marcar su salida.
+13. Reportar una incidencia y cambiar su estado a `EN_PROCESO` y `RESUELTO`.
+14. Registrar una reserva y verificar que no se duplique en la misma area, fecha y turno.
 
 ## 13. Mantenimiento y recomendaciones
 
@@ -380,8 +497,6 @@ Estilos:
 - Login y gestion de usuarios.
 - Roles de administrador, residente y operador.
 - Modulo de incidencias o mesa de ayuda.
-- Control de visitas.
-- Reservas de areas comunes.
 - Exportacion de recibos a PDF o Excel.
 - Filtros de busqueda en padrones y recibos.
 - Configuracion externa de conexion a base de datos.

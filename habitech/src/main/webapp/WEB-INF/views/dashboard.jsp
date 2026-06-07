@@ -25,9 +25,24 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/asignaciones.css">
     <% } %>
 
-    <%-- CAMBIO 1: Estilo aislado exclusivo para el Módulo de Recibos y Pagos --%>
+    <%-- Estilo aislado exclusivo para el Módulo de Recibos y Pagos --%>
     <% if ("recibos".equals(view)) { %>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/recibos.css">
+    <% } %>
+
+    <%-- INTEGRACIÓN MÓDULO 5: Estilo aislado exclusivo para el Control de Visitas --%>
+    <% if ("visitas".equals(view)) { %>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/visitas.css">
+    <% } %>
+
+    <%-- INTEGRACIÓN MÓDULO 6: Estilo aislado exclusivo para la Mesa de Ayuda --%>
+    <% if ("mesa_ayuda".equals(view)) { %>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mesa_ayuda.css">
+    <% } %>
+
+    <%-- INTEGRACIÓN MÓDULO 8: Estilo aislado exclusivo para Reservas de Áreas Comunes --%>
+    <% if ("reservas".equals(view)) { %>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservas.css">
     <% } %>
 </head>
 
@@ -44,13 +59,13 @@
         <a href="dashboard?view=maestro" class="<%= "maestro".equals(view) ? "active" : "" %>">⚙️ Maestro</a>
         <a href="dashboard?view=inmuebles" class="<%= "inmuebles".equals(view) ? "active" : "" %>">🏢 Inmuebles</a>
         <a href="dashboard?view=asignaciones" class="<%= "asignaciones".equals(view) ? "active" : "" %>">🔑 Asignación de viviendas</a>
-
-        <%-- CAMBIO 2: Enlace del menú actualizado para apuntar al módulo financiero de recibos --%>
         <a href="dashboard?view=recibos" class="<%= "recibos".equals(view) ? "active" : "" %>">💵 Recibo y estado de pago</a>
+        <a href="dashboard?view=visitas" class="<%= "visitas".equals(view) ? "active" : "" %>">🛂 Control de visitas</a>
+        <a href="dashboard?view=mesa_ayuda" class="<%= "mesa_ayuda".equals(view) ? "active" : "" %>">🔧 Mesa de ayuda</a>
 
-        <a href="#">Control de visitas</a>
-        <a href="#">Mesa de ayuda</a>
-        <a href="#">Reservas de áreas comunes</a>
+        <%-- INTEGRACIÓN MÓDULO 8: Enlace del menú activado para las Reservas de Áreas Comunes --%>
+        <a href="dashboard?view=reservas" class="<%= "reservas".equals(view) ? "active" : "" %>">📆 Reservas de áreas comunes</a>
+
         <a href="#">👤 Usuarios</a>
     </div>
 
@@ -74,8 +89,23 @@
         <%
             } else if ("recibos".equals(view)) {
         %>
-            <%-- CAMBIO 3: Inclusión aislada del fragmento visual del Módulo Recibos y Pagos --%>
+            <%-- Inclusión aislada del fragmento visual del Módulo Recibos y Pagos --%>
             <jsp:include page="/WEB-INF/views/recibos.jsp" />
+        <%
+            } else if ("visitas".equals(view)) {
+        %>
+            <%-- Inclusión aislada del fragmento visual de Control de Visitas --%>
+            <jsp:include page="/WEB-INF/views/visitas.jsp" />
+        <%
+            } else if ("mesa_ayuda".equals(view)) {
+        %>
+            <%-- Inclusión aislada del fragmento visual de la Mesa de Ayuda --%>
+            <jsp:include page="/WEB-INF/views/mesa_ayuda.jsp" />
+        <%
+            } else if ("reservas".equals(view)) {
+        %>
+            <%-- INTEGRACIÓN MÓDULO 8: Inclusión aislada del fragmento visual de Reservas de Áreas Comunes --%>
+            <jsp:include page="/WEB-INF/views/reservas.jsp" />
         <%
             } else {
         %>

@@ -1,0 +1,192 @@
+.modulo-incidencias {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.modulo-incidencias .header-modulo {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+.modulo-incidencias .titulo-modulo {
+    color: #0f172a;
+    font-size: 24px;
+    margin: 0;
+}
+.modulo-incidencias .descripcion-modulo {
+    color: #64748b;
+    font-size: 14px;
+    margin: 5px 0 0 0;
+}
+
+/* Layout Split */
+.bloque-split {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+}
+.card-formulario {
+    flex: 1;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+.card-tabla-datos {
+    flex: 2.2;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* Formulario */
+.form-habitech {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.grupo-campo label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+.input-control {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #f8fafc;
+}
+.input-control:focus {
+    border-color: #3b82f6;
+    background-color: #fff;
+}
+.text-area-control {
+    resize: none;
+    font-family: inherit;
+}
+
+.btn-registrar-ticket {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 5px;
+}
+.btn-registrar-ticket:hover {
+    background: #4338ca;
+}
+
+/* Tabla de Datos */
+.table-container {
+    overflow-x: auto;
+}
+.tabla-habitech {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.tabla-habitech th {
+    background: #f8fafc;
+    color: #64748b;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+.tabla-habitech td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.ticket-info .tk-titulo {
+    font-weight: 700;
+    color: #1e293b;
+    display: block;
+    font-size: 13.5px;
+}
+.ticket-info .tk-desc {
+    color: #64748b;
+    font-size: 11.5px;
+    display: block;
+    margin-top: 2px;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fechas-info {
+    font-family: monospace;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: #475569;
+}
+.fechas-info .pendiente {
+    color: #94a3b8;
+}
+
+/* Badges de Control Semáforo */
+.badge-prioridad {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+}
+.badge-prioridad.prio-alta { background: #fee2e2; color: #991b1b; }
+.badge-prioridad.prio-media { background: #fef3c7; color: #92400e; }
+.badge-prioridad.prio-baja { background: #e0f2fe; color: #0369a1; }
+
+.badge-estado-ticket {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 700;
+    display: inline-block;
+}
+.badge-estado-ticket.est-abierto { background: #f87171; color: white; }
+.badge-estado-ticket.est-enproceso { background: #fbbf24; color: #78350f; }
+.badge-estado-ticket.est-resuelto { background: #34d399; color: #064e3b; }
+
+/* Botones de Control de Estados */
+.acciones-flujo {
+    display: flex;
+    gap: 5px;
+}
+.btn-flujo {
+    border: none;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    color: white;
+}
+.btn-flujo.procesar { background: #d97706; }
+.btn-flujo.procesar:hover { background: #b45309; }
+.btn-flujo.resolver { background: #059669; }
+.btn-flujo.resolver:hover { background: #047857; }
+.btn-flujo:active { transform: scale(0.95); }
+
+.archivado-txt {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+}

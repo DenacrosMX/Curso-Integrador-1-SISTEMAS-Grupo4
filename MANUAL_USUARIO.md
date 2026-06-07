@@ -29,7 +29,10 @@ El sistema muestra una barra lateral con las siguientes opciones:
 - Inmuebles: generacion y visualizacion de departamentos y cocheras.
 - Asignacion de viviendas: registro de residentes en unidades vacantes.
 - Recibo y estado de pago: emision de recibos y registro de pagos.
-- Control de visitas, Mesa de ayuda, Reservas de areas comunes y Usuarios: opciones visibles en el menu, pero sin funcionalidad implementada en esta version.
+- Control de visitas: registro de ingreso y salida de visitantes.
+- Mesa de ayuda: reporte y seguimiento de incidencias.
+- Reservas de areas comunes: separacion de espacios compartidos.
+- Usuarios: opcion visible en el menu, pero sin funcionalidad implementada en esta version.
 
 ## 5. Modulo Maestro
 
@@ -154,8 +157,73 @@ Importante: el sistema evita duplicar recibos del mismo residente para el mismo 
 3. Asignar residentes a departamentos o cocheras vacantes.
 4. Emitir recibos mensuales.
 5. Registrar pagos conforme se realicen.
+6. Registrar visitas, incidencias y reservas segun la operacion diaria del condominio.
 
-## 10. Mensajes frecuentes
+## 10. Modulo Control de Visitas
+
+Este modulo permite registrar los ingresos de visitantes, delivery o servicio tecnico hacia una unidad del condominio.
+
+### Registrar ingreso
+
+1. Entrar a `Control de visitas`.
+2. Seleccionar la unidad de destino.
+3. Ingresar nombre del visitante.
+4. Ingresar DNI o documento.
+5. Ingresar placa vehicular si aplica.
+6. Seleccionar el tipo de ingreso: `VISITA`, `DELIVERY` o `SERVICIO_TECNICO`.
+7. Presionar el boton de registro.
+
+El sistema guardara la hora de ingreso y dejara la visita en estado `EN_CURSO`.
+
+### Registrar salida
+
+1. Ubicar una visita en estado `EN_CURSO`.
+2. Presionar la accion de salida.
+3. El sistema registrara la hora de salida y cambiara el estado a `FINALIZADO`.
+
+## 11. Modulo Mesa de Ayuda
+
+Este modulo permite reportar incidencias relacionadas con una unidad o area del condominio.
+
+### Reportar incidencia
+
+1. Entrar a `Mesa de ayuda`.
+2. Seleccionar la unidad relacionada.
+3. Ingresar titulo y descripcion del problema.
+4. Seleccionar prioridad: `BAJA`, `MEDIA` o `ALTA`.
+5. Registrar el ticket.
+
+El sistema creara la incidencia con estado `ABIERTO`.
+
+### Cambiar estado
+
+Desde la lista de incidencias se puede actualizar el estado a:
+
+- `EN_PROCESO`: cuando la incidencia esta siendo atendida.
+- `RESUELTO`: cuando la incidencia fue solucionada.
+
+## 12. Modulo Reservas de Areas Comunes
+
+Este modulo permite reservar areas compartidas del condominio.
+
+### Registrar reserva
+
+1. Entrar a `Reservas de areas comunes`.
+2. Seleccionar la vivienda solicitante.
+3. Seleccionar el area comun: `PARRILLA`, `SALON_EVENTOS` o `GIMNASIO`.
+4. Seleccionar la fecha.
+5. Seleccionar el turno.
+6. Confirmar la reserva.
+
+El sistema valida que no exista otra reserva para la misma area, fecha y turno.
+
+### Cancelar reserva
+
+1. Ubicar la reserva en la agenda.
+2. Presionar la accion de cancelar.
+3. Confirmar la accion.
+
+## 13. Mensajes frecuentes
 
 - `Nuevo registro guardado con exito`: la configuracion fue registrada.
 - `Registro actualizado correctamente`: los cambios fueron guardados.
@@ -163,12 +231,16 @@ Importante: el sistema evita duplicar recibos del mismo residente para el mismo 
 - `Residente asignado correctamente`: la unidad fue ocupada.
 - `No hay unidades vacantes disponibles`: todos los inmuebles estan ocupados o no existe inventario generado.
 - `No se generaron recibos nuevos`: el periodo ya fue facturado o no existen residentes asignados.
+- `Ingreso registrado`: la visita fue registrada en la bitacora.
+- `Ticket reportado`: la incidencia fue creada en mesa de ayuda.
+- `Reserva registrada`: el area comun fue separada correctamente.
 
-## 11. Recomendaciones de uso
+## 14. Recomendaciones de uso
 
 - Registrar primero la configuracion maestra antes de generar inmuebles.
 - No vaciar el inventario si ya existen asignaciones y recibos importantes.
 - Revisar que el RUC tenga 11 digitos.
 - Usar montos positivos para la cuota de mantenimiento.
 - Evitar generar recibos antes de registrar residentes.
-
+- Registrar la salida de visitantes para mantener la bitacora actualizada.
+- Revisar disponibilidad antes de confirmar una reserva de area comun.
