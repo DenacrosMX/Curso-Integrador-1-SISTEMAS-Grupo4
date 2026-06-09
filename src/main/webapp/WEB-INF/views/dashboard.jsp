@@ -42,7 +42,8 @@
                     <li><a href="${pageContext.request.contextPath}/dashboard?modulo=infraestructura" class="nav-link">Infraestructura</a></li>
                     <li><a href="${pageContext.request.contextPath}/dashboard?modulo=asignaciones" class="nav-link">Asignaciones</a></li>
                     <li><a href="#" class="nav-link">Recibos</a></li>
-                    <li><a href="#" class="nav-link">Visitas</a></li>
+                    <%-- ENLACE INTEGRADO: Módulo de Visitas (Corregido) --%>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=visitas" class="nav-link">Visitas</a></li>
                     <%-- ENLACE INTEGRADO: Módulo de Incidencias --%>
                     <li><a href="${pageContext.request.contextPath}/dashboard?modulo=incidencias" class="nav-link">Incidencias</a></li>
                     <%-- ENLACE INTEGRADO: Módulo de Reservas --%>
@@ -73,6 +74,11 @@
                 <%-- Renderizado dinámico del módulo de Asignaciones (Contratos/Ocupación) --%>
                 <c:when test="${moduloActivo == 'asignaciones'}">
                     <jsp:include page="asignaciones.jsp" />
+                </c:when>
+
+                <%-- INTEGRACIÓN: Renderizado del módulo de Visitas (NUEVO) --%>
+                <c:when test="${moduloActivo == 'visitas'}">
+                    <jsp:include page="visitas.jsp" />
                 </c:when>
 
                 <%-- INTEGRACIÓN: Renderizado del módulo de Incidencias --%>

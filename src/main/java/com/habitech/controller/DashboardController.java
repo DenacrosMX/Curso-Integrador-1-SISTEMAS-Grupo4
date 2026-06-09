@@ -13,7 +13,9 @@ import com.habitech.dao.impl.ComunicadoDaoImpl;
 import com.habitech.dao.ReservaDao;
 import com.habitech.dao.impl.ReservaDaoImpl;
 import com.habitech.dao.IncidenciaDao;
-import com.habitech.dao.impl.IncidenciaDaoImpl; // Inyección del DAO de Incidencias
+import com.habitech.dao.impl.IncidenciaDaoImpl;
+import com.habitech.dao.VisitaDao;                // Import limpio
+import com.habitech.dao.impl.VisitaDaoImpl;        // Import limpio
 
 import com.habitech.model.Usuario;
 import com.habitech.model.Configuracion;
@@ -21,7 +23,8 @@ import com.habitech.model.InventarioInfraestructura;
 import com.habitech.model.Asignacion;
 import com.habitech.model.Comunicado;
 import com.habitech.model.Reserva;
-import com.habitech.model.Incidencia; // Import del modelo
+import com.habitech.model.Incidencia;
+import com.habitech.model.Visita;                  // Import limpio
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -44,7 +47,8 @@ public class DashboardController extends HttpServlet {
     private final AsignacionDao asignacionDao = new AsignacionDaoImpl();
     private final ComunicadoDao comunicadoDao = new ComunicadoDaoImpl();
     private final ReservaDao reservaDao = new ReservaDaoImpl();
-    private final IncidenciaDao incidenciaDao = new IncidenciaDaoImpl(); // Instancia del DAO de Incidencias
+    private final IncidenciaDao incidenciaDao = new IncidenciaDaoImpl();
+    private final VisitaDao visitaDao = new VisitaDaoImpl(); // Instancia única como los otros DAOs
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -160,16 +164,26 @@ public class DashboardController extends HttpServlet {
                     request.setAttribute("alertaError", "El área seleccionada ya se encuentra reservada en esa fecha y turno.");
                 }
 
-                // MÓDULO 7: CONTROL DE INCIDENCIAS (NUEVO)
+                // MÓDULO 7: CONTROL DE INCIDENCIAS
             } else if ("incidencias".equals(modulo)) {
                 request.setAttribute("moduloActivo", "incidencias");
                 request.setAttribute("cssModulo", "incidencias.css");
 
-                // 1. Carga de historial completo de incidencias
                 List<Incidencia> listaIncidencias = incidenciaDao.listarTodas();
                 request.setAttribute("incidencias", listaIncidencias);
 
-                // 2. Carga de asignaciones vigentes para vincular la incidencia a un departamento/vivienda
+                List<Asignacion> listaAsignaciones = asignacionDao.listarTodas();
+                request.setAttribute("asignaciones", listaAsignaciones);
+
+                // MÓDULO 8: CONTROL DE VISITAS E INGRESOS (CORREGIDO Y ULTRA-LIGERO)
+            } else if ("visitas".equals(modulo)) {
+                request.setAttribute("moduloActivo", "visitas");
+                request.setAttribute("cssModulo", "visitas.css");
+
+                // Solo actuamos como puente: cargamos la data requerida por la vista y listo
+                List<Visita> listaVisitas = visitaDao.listarTodos();
+                request.setAttribute("visitas", listaVisitas);
+
                 List<Asignacion> listaAsignaciones = asignacionDao.listarTodas();
                 request.setAttribute("asignaciones", listaAsignaciones);
 

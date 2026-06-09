@@ -1,89 +1,117 @@
 package com.habitech.dao.impl;
 
+import com.habitech.dao.VisitaDao;
+import com.habitech.model.Visita;
 import com.habitech.config.ConexionDB;
-import com.habitech.dao.VisitaDAO;
-import com.habitech.model.InmuebleModel;
-import com.habitech.model.VisitaModel;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisitaDAOImpl implements VisitaDAO {
+public class VisitaDaoImpl implements VisitaDao {
 
     @Override
-    public List<VisitaModel> listarVisitasRecientes() {
-        List<VisitaModel> lista = new ArrayList<>();
-        String sql = "SELECT v.*, i.nro_unidad, i.bloque_torre, i.tipo_unidad " +
+    public boolean registrarIngreso(Visita visita) {
+        String sql = "INSERT INTO visitas (asignacion_id, conserje_id, nombre_visitante, dni_visitante, placa_vehiculo, tipo_ingreso) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, visita.getAsignacionId());
+            if (visita.getConserjeId() != null) {
+                ps.setInt(2, visita.getConserjeId());
+            } else {
+                ps.setNull(2, Types.INTEGER);
+            }
+            ps.setString(3, visita.getNombreVisitante());
+            ps.setString(4, visita.getDniVisitante());
+            ps.setString(5, visita.getPlacaVehiculo());
+            ps.setString(6, visita.getTipoIngreso());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean registrarSalida(int id) {
+        String sql = "UPDATE visitas SET fecha_hora_out = CURRENT_TIMESTAMP, estado = 'FINALIZADO' WHERE id = ? AND estado = 'EN_CURSO'";
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean anularRegistro(int id) {
+        String sql = "UPDATE visitas SET estado = 'ANULADO' WHERE id = ? AND estado = 'EN_CURSO'";
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public List<Visita> listarTodos() {
+        List<Visita> lista = new ArrayList<>();
+        // COLUMNA CORREGIDA: u.nombres en lugar de u.nombre
+        String sql = "SELECT v.*, " +
+                "       a.codigo_unidad_especifica, " +
+                "       i.tipo_elemento, i.torre, i.nro_piso, " +
+                "       u.nombres AS nombre_conserje " +
                 "FROM visitas v " +
-                "INNER JOIN inmuebles i ON v.inmueble_id = i.id " +
-                "ORDER BY v.estado DESC, v.fecha_hora_ingreso DESC";
+                "INNER JOIN asignaciones a ON v.asignacion_id = a.id " +
+                "INNER JOIN inventario_maestro_infraestructura i ON a.inventario_maestro_id = i.id " +
+                "LEFT JOIN usuarios u ON v.conserje_id = u.id " +
+                "ORDER BY v.fecha_hora_ingreso DESC";
 
         try (Connection conn = ConexionDB.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
-                VisitaModel vis = new VisitaModel(
-                        rs.getInt("id"), rs.getInt("inmueble_id"), (Integer) rs.getObject("conserje_id"),
-                        rs.getString("nombre_visitante"), rs.getString("dni_visitante"),
-                        rs.getString("placa_vehiculo"), rs.getString("tipo_ingreso"),
-                        rs.getTimestamp("fecha_hora_ingreso"), rs.getTimestamp("fecha_hora_out"),
-                        rs.getString("estado")
-                );
+                Visita v = new Visita();
+                v.setId(rs.getInt("id"));
+                v.setAsignacionId(rs.getInt("asignacion_id"));
 
-                InmuebleModel inm = new InmuebleModel();
-                inm.setNroUnidad(rs.getString("nro_unidad"));
-                inm.setBloqueTorre(rs.getString("bloque_torre"));
-                inm.setTipoUnidad(rs.getString("tipo_unidad"));
-                vis.setInmueble(inm);
+                int consId = rs.getInt("conserje_id");
+                v.setConserjeId(rs.wasNull() ? null : consId);
 
-                lista.add(vis);
+                v.setNombreVisitante(rs.getString("nombre_visitante"));
+                v.setDniVisitante(rs.getString("dni_visitante"));
+                v.setPlacaVehiculo(rs.getString("placa_vehiculo"));
+                v.setTipoIngreso(rs.getString("tipo_ingreso"));
+
+                Timestamp ingreso = rs.getTimestamp("fecha_hora_ingreso");
+                if (ingreso != null) v.setFechaHoraIngreso(ingreso.toLocalDateTime());
+
+                Timestamp salida = rs.getTimestamp("fecha_hora_out");
+                if (salida != null) v.setFechaHoraOut(salida.toLocalDateTime());
+
+                v.setEstado(rs.getString("estado"));
+                v.setCodigoUnidadEspecifica(rs.getString("codigo_unidad_especifica"));
+                v.setNombreConserje(rs.getString("nombre_conserje"));
+
+                // Formateamos el detalle de la infraestructura usando la lógica exacta de tu sistema
+                int piso = rs.getInt("nro_piso");
+                String textPiso = (piso < 0) ? "SÓTANO " + (piso * -1) : (piso == 0) ? "PLANTA BAJA" : "PISO " + piso;
+                String detalle = rs.getString("torre") + " - " + textPiso + " (" + rs.getString("tipo_elemento") + ")";
+                v.setDetalleInfraestructura(detalle);
+
+                lista.add(v);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return lista;
-    }
-
-    @Override
-    public List<InmuebleModel> listarTodosLosInmuebles() {
-        List<InmuebleModel> lista = new ArrayList<>();
-        String sql = "SELECT id, bloque_torre, nro_unidad, tipo_unidad FROM inmuebles ORDER BY bloque_torre, nro_unidad";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                InmuebleModel i = new InmuebleModel();
-                i.setId(rs.getInt("id"));
-                i.setBloqueTorre(rs.getString("bloque_torre"));
-                i.setNroUnidad(rs.getString("nro_unidad"));
-                i.setTipoUnidad(rs.getString("tipo_unidad"));
-                lista.add(i);
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return lista;
-    }
-
-    @Override
-    public boolean registrarIngreso(VisitaModel visita) {
-        String sql = "INSERT INTO visitas (inmueble_id, nombre_visitante, dni_visitante, placa_vehiculo, tipo_ingreso) " +
-                "VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, visita.getInmuebleId());
-            ps.setString(2, visita.getNombreVisitante());
-            ps.setString(3, visita.getDniVisitante());
-            ps.setString(4, (visita.getPlacaVehiculo() == null || visita.getPlacaVehiculo().isEmpty()) ? null : visita.getPlacaVehiculo());
-            ps.setString(5, visita.getTipoIngreso());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
-    }
-
-    @Override
-    public boolean registrarSalida(int idVisita) {
-        String sql = "UPDATE visitas SET fecha_hora_out = CURRENT_TIMESTAMP, estado = 'FINALIZADO' WHERE id = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idVisita);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 }

@@ -1,176 +1,324 @@
-.modulo-visitas {
+/* ==========================================================================
+   MÓDULO DE CONTROL DE VISITAS - HABITECH SYSTEM
+   ========================================================================== */
+
+.modulo-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* Animación de Entrada Suave */
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estructura Base de Tarjetas (Cards) */
+.card-habitech {
+    background-color: #1e293b; /* Slate 800 */
+    border: 1px solid #334155; /* Slate 700 */
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-margin-top {
+    margin-top: 24px;
+}
+
+/* Cabecera de Módulos */
+.card-header-habitech {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 16px;
 }
-.modulo-visitas .header-modulo {
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 10px;
-}
-.modulo-visitas .titulo-modulo {
-    color: #0f172a;
+
+.icono-titulo {
     font-size: 24px;
+    background-color: #0f172a;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+}
+
+.card-header-habitech h2 {
+    color: #f8fafc;
+    font-size: 1.35rem;
+    font-weight: 600;
     margin: 0;
 }
-.modulo-visitas .descripcion-modulo {
-    color: #64748b;
-    font-size: 14px;
-    margin: 5px 0 0 0;
+
+.card-header-habitech .subtitulo {
+    color: #94a3b8;
+    font-size: 0.88rem;
+    margin: 4px 0 0 0;
 }
 
-/* Layout Split */
-.bloque-split {
-    display: flex;
-    gap: 25px;
-    align-items: flex-start;
-}
-.card-formulario {
-    flex: 1;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    border: 1px solid #e2e8f0;
-}
-.card-tabla-datos {
-    flex: 2;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    border: 1px solid #e2e8f0;
+/* Sistema de Grillas para Formularios */
+.form-grid-habitech {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
 }
 
-/* Campos del Formulario */
-.form-habitech {
+.form-group-habitech {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-.grupo-campo {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-.grupo-campo label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
-}
-.input-control {
-    padding: 10px;
-    border: 1px solid #cbd5e1;
-    border-radius: 5px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-.input-control:focus {
-    border-color: #3b82f6;
+    gap: 8px;
 }
 
-.btn-registrar-ingreso {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-weight: 600;
-    font-size: 14px;
+.form-group-habitech label {
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.form-group-habitech input,
+.form-group-habitech select {
+    background-color: #0f172a;
+    border: 1px solid #475569;
     border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-registrar-ingreso:hover {
-    background: #1d4ed8;
+    color: #f1f5f9;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Diseño de la Tabla y Badges */
-.table-container {
-    overflow-x: auto;
+.form-group-habitech input:focus,
+.form-group-habitech select:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
-.tabla-habitech {
+
+.form-group-habitech input::placeholder {
+    color: #64748b;
+}
+
+/* Botones y Acciones */
+.form-acciones-habitech {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-primario-habitech {
+    background-color: #0284c7; /* Sky 600 */
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primario-habitech:hover {
+    background-color: #0369a1;
+}
+
+/* Tablas Responsivas Estilo Habitech */
+.tabla-responsive-habitech {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background-color: #0f172a;
+}
+
+.tabla-maestra-habitech {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
-}
-.tabla-habitech th {
-    background: #f8fafc;
-    color: #64748b;
     text-align: left;
-    padding: 12px;
-    border-bottom: 2px solid #e2e8f0;
+    font-size: 0.88rem;
 }
-.tabla-habitech td {
-    padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
+
+.tabla-maestra-habitech th {
+    background-color: #1e293b;
+    color: #94a3b8;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 1px solid #334155;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.tabla-maestra-habitech td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #1e293b;
+    color: #e2e8f0;
     vertical-align: middle;
 }
 
-.visitante-info .v-name {
-    font-weight: 600;
-    color: #1e293b;
-    display: block;
+.tabla-maestra-habitech tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
 }
-.visitante-info .v-doc {
+
+/* Componentes Celda */
+.col-id {
     color: #64748b;
-    font-size: 11px;
-}
-.fechas-info {
+    font-weight: 500;
     font-family: monospace;
-    font-size: 11px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
 }
 
-.badge-tipo-ingreso {
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 700;
+.nombre-principal {
+    font-weight: 500;
+    color: #f8fafc;
 }
-.badge-tipo-ingreso.tipo-visita { background: #e0f2fe; color: #0369a1; }
-.badge-tipo-ingreso.tipo-delivery { background: #ffedd5; color: #c2410c; }
-.badge-tipo-ingreso.tipo-servicio_tecnico { background: #f3e8ff; color: #6b21a8; }
 
-.badge-estado-visita {
-    font-size: 11px;
-    padding: 4px 8px;
+.subtexto-tabla {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.badge-unidad {
+    display: inline-block;
+    background-color: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    padding: 2px 6px;
     border-radius: 4px;
-    font-weight: 700;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-top: 4px;
 }
-.badge-estado-visita.vis-curso {
-    background: #fef3c7;
-    color: #d97706;
-    animation: pulsoEfecto 2s infinite;
+
+.texto-tiempo {
+    font-family: monospace;
+    color: #cbd5e1;
 }
-.badge-estado-visita.vis-fin {
-    background: #f1f5f9;
+
+.texto-vacio {
     color: #475569;
 }
 
-.btn-tabla-salida {
-    background: #dc2626;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.btn-tabla-salida:hover {
-    background: #b91c1c;
-}
-.text-finalizado {
-    color: #94a3b8;
-    font-size: 12px;
-    font-weight: 600;
+.estado-dentro {
+    color: #fb923c;
+    font-style: italic;
+    font-size: 0.82rem;
 }
 
-@keyframes pulsoEfecto {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+/* Badges de Estado y Tipo (Opacidad Sutil) */
+.badge-tipo {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.tipo-visita { background-color: rgba(16, 185, 129, 0.12); color: #10b981; }
+.tipo-delivery { background-color: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.tipo-servicio { background-color: rgba(99, 102, 241, 0.12); color: #6366f1; }
+
+.badge-estado {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.est-progreso { background-color: rgba(251, 146, 60, 0.15); color: #fb923c; }
+.est-completado { background-color: rgba(74, 222, 128, 0.12); color: #4ade80; }
+.est-anulado { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+/* Celda de Acciones dentro de la Tabla */
+.acciones-celda {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-tabla {
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: background-color 0.15s, color 0.15s;
+    text-align: center;
+}
+
+.btn-salida {
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+}
+
+.btn-salida:hover {
+    background-color: rgba(74, 222, 128, 0.1);
+}
+
+.btn-anular {
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: #f87171;
+}
+
+.btn-anular:hover {
+    background-color: rgba(248, 113, 113, 0.1);
+}
+
+.bloqueado-indicador {
+    color: #475569;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.tabla-vacia {
+    text-align: center;
+    color: #64748b;
+    padding: 32px !important;
+}
+
+/* Alertas de Mensaje de Error */
+.alerta-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.icono-alerta {
+    font-size: 18px;
+}
+
+.alerta-contenido strong {
+    color: #f87171;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.alerta-contenido p {
+    color: #fca5a5;
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+}
+
+/* Responsividad para móviles */
+@media (max-width: 600px) {
+    .form-grid-habitech {
+        grid-template-columns: 1fr;
+    }
+    .full-width-mobile {
+        grid-column: span 1;
+    }
+    .card-header-habitech {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
 }
