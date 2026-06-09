@@ -1,75 +1,143 @@
 package com.habitech.dao.impl;
 
 import com.habitech.config.ConexionDB;
-import com.habitech.dao.ReservaDAO;
-import com.habitech.model.InmuebleModel;
-import com.habitech.model.ReservaModel;
+import com.habitech.dao.ReservaDao;
+import com.habitech.model.Reserva;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReservaDAOImpl implements ReservaDAO {
+public class ReservaDaoImpl implements ReservaDao {
 
     @Override
-    public List<ReservaModel> listarReservas() {
-        List<ReservaModel> lista = new ArrayList<>();
-        String sql = "SELECT r.*, i.bloque_torre, i.nro_unidad FROM reservas r " +
-                "INNER JOIN inmuebles i ON r.inmueble_id = i.id " +
-                "ORDER BY r.fecha_reserva ASC, r.turno DESC";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
+    public boolean insertar(Reserva reserva) {
+        String sql = "INSERT INTO reservas (usuario_id, inventario_maestro_id, fecha_reserva, turno, estado) VALUES (?, ?, ?, ?, ?)";
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, reserva.getUsuarioId());
+            ps.setInt(2, reserva.getInventarioMaestroId());
+            ps.setObject(3, reserva.getFechaReserva()); // Inyección directa de LocalDate
+            ps.setString(4, reserva.getTurno());
+            ps.setString(5, reserva.getEstado());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public List<Reserva> listarTodas() {
+        List<Reserva> lista = new ArrayList<>();
+        // Query avanzada que cruza tablas para armar la grilla visual informativa
+        String sql = "SELECT r.id, r.usuario_id, r.inventario_maestro_id, r.fecha_reserva, r.turno, r.estado, r.fecha_registro, "
+                + "       (u.nombres || ' ' || u.apellidos) AS nombre_completo, i.nombre_item AS area_comun "
+                + "FROM reservas r "
+                + "LEFT JOIN usuarios u ON r.usuario_id = u.id "
+                + "LEFT JOIN inventario_maestro_infraestructura i ON r.inventario_maestro_id = i.id "
+                + "ORDER BY r.fecha_reserva DESC, r.turno ASC";
+
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
-                ReservaModel res = new ReservaModel(
-                        rs.getInt("id"), rs.getInt("inmueble_id"), rs.getString("area_comun"),
-                        rs.getDate("fecha_reserva"), rs.getString("turno"), rs.getTimestamp("fecha_registro")
-                );
-                InmuebleModel inm = new InmuebleModel();
-                inm.setBloqueTorre(rs.getString("bloque_torre"));
-                inm.setNroUnidad(rs.getString("nro_unidad"));
-                res.setInmueble(inm);
-                lista.add(res);
+                Reserva r = new Reserva();
+                r.setId(rs.getInt("id"));
+                r.setUsuarioId(rs.getInt("usuario_id"));
+                r.setInventarioMaestroId(rs.getInt("inventario_maestro_id"));
+                r.setFechaReserva(rs.getObject("fecha_reserva", LocalDate.class));
+                r.setTurno(rs.getString("turno"));
+                r.setEstado(rs.getString("estado"));
+
+                Timestamp regTime = rs.getTimestamp("fecha_registro");
+                if (regTime != null) {
+                    r.setFechaRegistro(regTime.toInstant().atOffset(ZoneOffset.UTC));
+                }
+
+                // Seteamos los campos adicionales del JOIN
+                r.setNombreUsuario(rs.getString("nombre_completo"));
+                r.setNombreAreaComun(rs.getString("area_comun"));
+
+                lista.add(r);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return lista;
     }
 
     @Override
-    public boolean verificarDisponibilidad(String area, Date fecha, String turno) {
-        String sql = "SELECT COUNT(*) FROM reservas WHERE area_comun = ? AND fecha_reserva = ? AND turno = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, area);
-            ps.setDate(2, fecha);
-            ps.setString(3, turno);
+    public Reserva obtenerPorId(int id) {
+        String sql = "SELECT id, usuario_id, inventario_maestro_id, fecha_reserva, turno, estado, fecha_registro FROM reservas WHERE id = ?";
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt(1) == 0;
+                if (rs.next()) {
+                    Reserva r = new Reserva();
+                    r.setId(rs.getInt("id"));
+                    r.setUsuarioId(rs.getInt("usuario_id"));
+                    r.setInventarioMaestroId(rs.getInt("inventario_maestro_id"));
+                    r.setFechaReserva(rs.getObject("fecha_reserva", LocalDate.class));
+                    r.setTurno(rs.getString("turno"));
+                    r.setEstado(rs.getString("estado"));
+
+                    Timestamp regTime = rs.getTimestamp("fecha_registro");
+                    if (regTime != null) {
+                        r.setFechaRegistro(regTime.toInstant().atOffset(ZoneOffset.UTC));
+                    }
+                    return r;
+                }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean cancelarReserva(int id) {
+        String sql = "UPDATE reservas SET estado = 'CANCELADA' WHERE id = ?";
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean existeReserva(int inventarioMaestroId, LocalDate fecha, String turno) {
+        String sql = "SELECT COUNT(*) FROM reservas WHERE inventario_maestro_id = ? AND fecha_reserva = ? AND turno = ? AND estado != 'CANCELADA'";
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, inventarioMaestroId);
+            ps.setObject(2, fecha);
+            ps.setString(3, turno);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
-    }
-
-    @Override
-    public boolean registrarReserva(ReservaModel reserva) {
-        String sql = "INSERT INTO reservas (inmueble_id, area_comun, fecha_reserva, turno) VALUES (?, ?, ?, ?)";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, reserva.getInmuebleId());
-            ps.setString(2, reserva.getAreaComun());
-            ps.setDate(3, reserva.getFechaReserva());
-            ps.setString(4, reserva.getTurno());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
-    }
-
-    @Override
-    public boolean eliminarReserva(int idReserva) {
-        String sql = "DELETE FROM reservas WHERE id = ?";
-        try (Connection conn = ConexionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, idReserva);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 }

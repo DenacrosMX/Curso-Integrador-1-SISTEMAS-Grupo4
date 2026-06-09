@@ -1,65 +1,255 @@
-.modulo-asignaciones {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+/* ==========================================================================
+   HABITECH - MODULO ASIGNACIONES (ESTILOS COMPLETO)
+   ========================================================================== */
+
+.modulo-contenedor {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-.modulo-asignaciones .titulo-modulo { color: #1e293b; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
-.modulo-asignaciones .descripcion-modulo { color: #64748b; font-size: 13.5px; margin: 0; }
-
-.bloque-split {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-}
-@media (min-width: 992px) {
-    .bloque-split { grid-template-columns: 350px 1fr; }
+    gap: 30px;
+    animation: fadeIn 0.4s ease-in-out;
 }
 
-.card-formulario, .card-tabla-datos {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+/* 📋 TARJETA DEL FORMULARIO */
+.card-formulario {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.card-formulario h3, .card-tabla-datos h3 {
-    margin-top: 0; margin-bottom: 16px; font-size: 14px; color: #1e293b;
-    border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; text-transform: uppercase;
+.card-formulario h2 {
+    color: #38bdf8;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 10px;
 }
 
-.form-habitech { display: flex; flex-direction: column; gap: 14px; }
-.grupo-campo { display: flex; flex-direction: column; gap: 5px; }
-.grupo-campo label { font-size: 12.5px; font-weight: 600; color: #475569; }
-
-.input-control {
-    padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;
-    font-size: 13px; color: #1e293b; background: #f8fafc; outline: none;
+/* 📊 TARJETA DE LA TABLA */
+.card-tabla {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
-.input-control:focus { border-color: #3b82f6; background: #fff; }
 
-.btn-guardar-asignacion {
-    background: #2563eb; color: white; border: none; padding: 11px;
-    font-weight: 600; font-size: 13px; border-radius: 6px; cursor: pointer;
-    transition: background 0.2s; margin-top: 6px;
+.card-tabla h2 {
+    color: #f8fafc;
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+    font-weight: 600;
 }
-.btn-guardar-asignacion:hover { background: #1d4ed8; }
 
-/* TABLA ESTILOS */
-.table-container { overflow-x: auto; }
-.tabla-habitech { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-.tabla-habitech th { background: #f8fafc; color: #64748b; padding: 12px; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
-.tabla-habitech td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-
-.badge-tipo-un { background: #e0f2fe; color: #0369a1; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-.badge-regimen { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
-.badge-regimen.reg-prop { background: #fef3c7; color: #d97706; }
-.badge-regimen.reg-inq { background: #e0e7ff; color: #4f46e5; }
-
-.btn-tabla-eliminar {
-    background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;
-    padding: 4px 8px; font-size: 11.5px; font-weight: 600; border-radius: 4px;
-    cursor: pointer; transition: background 0.2s;
+/* 📑 ELEMENTOS DEL FORMULARIO */
+.form-habitech {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
-.btn-tabla-eliminar:hover { background: #fca5a5; }
+
+.form-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 220px;
+}
+
+.form-group label {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-control {
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    color: #f8fafc;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+select.form-control option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+/* ⚡ BOTONES Y ACCIONES */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+    border-top: 1px solid #334155;
+    padding-top: 16px;
+}
+
+.btn-primary {
+    background-color: #0284c7;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0369a1;
+}
+
+.btn-secondary {
+    background-color: #475569;
+    color: #f8fafc;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #334155;
+}
+
+/* 🧮 GRID / TABLA DE DATOS */
+.tabla-habitech {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.tabla-habitech th {
+    background-color: #0f172a;
+    color: #94a3b8;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 2px solid #334155;
+}
+
+.tabla-habitech td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #334155;
+    color: #e2e8f0;
+}
+
+.tabla-habitech tr:hover td {
+    background-color: rgba(51, 65, 85, 0.3);
+}
+
+.text-bold {
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+.tabla-vacia {
+    text-align: center;
+    color: #64748b !important;
+    font-style: italic;
+    padding: 30px !important;
+}
+
+/* 🏷️ BADGES E INSIGNIAS CONDICIONALES */
+.badge-tipo {
+    background-color: #1e1b4b;
+    color: #c7d2fe;
+    border: 1px solid #3730a3;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.badge-cantidad {
+    background-color: #0f172a;
+    color: #38bdf8;
+    border: 1px solid #0369a1;
+    padding: 4px 10px;       /* Ajuste ligero de padding interno */
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-block;   /* Asegura comportamiento de bloque en línea */
+    white-space: nowrap;     /* TRUCO MAESTRO: Impide terminantemente que el texto se parta en dos líneas */
+}
+
+.badge-estado {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.badge-estado.activo {
+    background-color: rgba(22, 163, 74, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-estado.inactivo {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ⚙️ ICONOS DE ACCIÓN */
+.acciones-iconos {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.icon-edit, .icon-delete {
+    text-decoration: none;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    display: inline-block;
+}
+
+.icon-edit:hover, .icon-delete:hover {
+    transform: scale(1.2);
+}
+
+/* ✨ ANIMACIÓN FADEIN */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}

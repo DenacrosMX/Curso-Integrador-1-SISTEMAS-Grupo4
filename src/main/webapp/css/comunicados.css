@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MÓDULO DE RESERVAS - ARQUITECTURA VISUAL HABITECH
+   MÓDULO DE COMUNICADOS - ARQUITECTURA VISUAL HABITECH
    ========================================================================== */
 
 .modulo-container {
@@ -11,17 +11,7 @@
     color: #e2e8f0;
 }
 
-/* Banner de Notificación de Alertas / Cruces de Agenda */
-.alerta-error {
-    background-color: rgba(239, 68, 68, 0.15);
-    border: 1px solid #ef4444;
-    color: #f87171;
-    padding: 14px 20px;
-    border-radius: 6px;
-    font-size: 0.95rem;
-}
-
-/* Estructura Base de Tarjetas */
+/* Tarjetas base de contenido */
 .card-formulario, .card-historial {
     background-color: #1e293b;
     border-radius: 8px;
@@ -38,10 +28,10 @@
     padding-bottom: 10px;
 }
 
-/* Formulario Grid */
+/* Sistema de Grid para el Formulario */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
 }
 
@@ -51,14 +41,20 @@
     gap: 8px;
 }
 
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
 .form-group label {
     font-size: 0.9rem;
     color: #94a3b8;
     font-weight: 500;
 }
 
+/* Elementos de entrada de Datos */
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
     background-color: #0f172a;
     border: 1px solid #334155;
     border-radius: 6px;
@@ -66,17 +62,26 @@
     color: #f8fafc;
     font-size: 0.95rem;
     outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group textarea {
+    resize: vertical;
+    font-family: inherit;
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
     border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
 }
 
-/* Acciones y Botones */
+/* Botones y Acciones del Formulario */
 .form-acciones {
     margin-top: 24px;
     display: flex;
+    gap: 15px;
     justify-content: flex-start;
 }
 
@@ -89,25 +94,43 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.95rem;
+    transition: background-color 0.2s;
 }
 
 .btn-guardar:hover {
     background-color: #0ea5e9;
 }
 
-/* Grilla de Datos */
+.btn-cancelar {
+    background-color: #475569;
+    color: #f8fafc;
+    font-weight: 600;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.btn-cancelar:hover {
+    background-color: #334155;
+}
+
+/* Estructura de la Grilla de Datos */
 .tabla-responsive {
     overflow-x: auto;
 }
 
-.tabla-reservas {
+.tabla-comunicados {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
     font-size: 0.95rem;
 }
 
-.tabla-reservas th {
+.tabla-comunicados th {
     background-color: #0f172a;
     color: #94a3b8;
     font-weight: 600;
@@ -115,34 +138,38 @@
     border-bottom: 2px solid #334155;
 }
 
-.tabla-reservas td {
+.tabla-comunicados td {
     padding: 14px 16px;
     border-bottom: 1px solid #334155;
     color: #cbd5e1;
 }
 
-.tabla-reservas tbody tr:hover {
+.tabla-comunicados tbody tr:hover {
     background-color: #24334d;
 }
 
-.badge-area {
-    color: #f8fafc;
-    font-weight: 500;
+.titulo-recortado {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Badges de Turnos */
-.badge-turno {
+/* Badges Dinámicos de Categorías */
+.badge-categoria {
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
 }
-.badge-turno.mañana { background-color: rgba(56, 189, 248, 0.15); color: #38bdf8; }
-.badge-turno.tarde { background-color: rgba(249, 115, 22, 0.15); color: #fb923c; }
-.badge-turno.noche { background-color: rgba(168, 85, 247, 0.15); color: #c084fc; }
 
-/* Badges de Estados */
+.badge-categoria.informativo { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.badge-categoria.urgente { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+.badge-categoria.mantenimiento { background-color: rgba(234, 179, 8, 0.2); color: #facc15; }
+.badge-categoria.asamblea { background-color: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+/* Badges de Visibilidad de Estado */
 .badge-estado {
     padding: 4px 8px;
     border-radius: 4px;
@@ -150,27 +177,26 @@
     font-weight: 700;
     text-transform: uppercase;
 }
-.badge-estado.probada { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; }
-.badge-estado.cancelada { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
 
-/* Operación de Cancelación rápida */
-.btn-cancelar-reserva {
-    background-color: transparent;
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.4);
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
+.badge-estado.publicado { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.badge-estado.oculto { background-color: rgba(100, 116, 139, 0.2); color: #94a3b8; }
+
+/* Botones de Operación (Editar/Eliminar) */
+.acciones-flex {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-accion {
     text-decoration: none;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    border-radius: 4px;
     transition: background-color 0.2s;
 }
 
-.btn-cancelar-reserva:hover {
-    background-color: rgba(239, 68, 68, 0.2);
-}
-
-.texto-bloqueado {
-    color: #64748b;
+.btn-accion:hover {
+    background-color: #334155;
 }
 
 .text-center {

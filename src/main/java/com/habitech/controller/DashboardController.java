@@ -1,130 +1,182 @@
 package com.habitech.controller;
 
-import com.habitech.dao.AsignacionDAO;
-import com.habitech.dao.InmuebleDAO;
-import com.habitech.dao.MaestroDAO;
-import com.habitech.dao.ReciboDAO;
-import com.habitech.dao.VisitaDAO;
-import com.habitech.dao.IncidenciaDAO;
-import com.habitech.dao.ReservaDAO; // Importación Módulo 8: Reservas
-import com.habitech.dao.UsuarioDAO; // Importación Módulo 3: Usuarios
-import com.habitech.dao.impl.AsignacionDAOImpl;
-import com.habitech.dao.impl.InmuebleDAOImpl;
-import com.habitech.dao.impl.MaestroDAOImpl;
-import com.habitech.dao.impl.ReciboDAOImpl;
-import com.habitech.dao.impl.VisitaDAOImpl;
-import com.habitech.dao.impl.IncidenciaDAOImpl;
-import com.habitech.dao.impl.ReservaDAOImpl; // Importación Módulo 8: Reservas
-import com.habitech.dao.impl.UsuarioDAOImpl; // Importación Módulo 3: Usuarios
-import com.habitech.model.InmuebleModel;
-import com.habitech.model.MaestroModel;
-import com.habitech.model.AsignacionModel;
-import com.habitech.model.ReciboModel;
-import com.habitech.model.VisitaModel;
-import com.habitech.model.IncidenciaModel;
-import com.habitech.model.ReservaModel; // Importación Módulo 8: Reservas
-import com.habitech.model.UsuarioModel; // Importación Módulo 3: Usuarios
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import com.habitech.dao.UsuarioDao;
+import com.habitech.dao.impl.UsuarioDaoImpl;
+import com.habitech.dao.ConfiguracionDao;
+import com.habitech.dao.impl.ConfiguracionDaoImpl;
+import com.habitech.dao.InventarioInfraestructuraDao;
+import com.habitech.dao.impl.InventarioInfraestructuraDaoImpl;
+import com.habitech.dao.AsignacionDao;
+import com.habitech.dao.impl.AsignacionDaoImpl;
+import com.habitech.dao.ComunicadoDao;
+import com.habitech.dao.impl.ComunicadoDaoImpl;
+import com.habitech.dao.ReservaDao;
+import com.habitech.dao.impl.ReservaDaoImpl;
+
+import com.habitech.model.Usuario;
+import com.habitech.model.Configuracion;
+import com.habitech.model.InventarioInfraestructura;
+import com.habitech.model.Asignacion;
+import com.habitech.model.Comunicado;
+import com.habitech.model.Reserva;
+
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@WebServlet("/dashboard")
+@WebServlet(name = "DashboardController", urlPatterns = {"/dashboard"})
 public class DashboardController extends HttpServlet {
-    private final MaestroDAO maestroDAO = new MaestroDAOImpl();
-    private final InmuebleDAO inmuebleDAO = new InmuebleDAOImpl();
-    private final AsignacionDAO asignacionDAO = new AsignacionDAOImpl();
-    private final ReciboDAO reciboDAO = new ReciboDAOImpl();
-    private final VisitaDAO visitaDAO = new VisitaDAOImpl();
-    private final IncidenciaDAO incidenciaDAO = new IncidenciaDAOImpl();
-    private final ReservaDAO reservaDAO = new ReservaDAOImpl(); // Instancia de Reservas (Módulo 8)
-    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl(); // Instancia de Usuarios (Módulo 3)
+
+    private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
+
+    private final UsuarioDao usuarioDao = new UsuarioDaoImpl();
+    private final ConfiguracionDao configuracionDao = new ConfiguracionDaoImpl();
+    private final InventarioInfraestructuraDao infraestructuraDao = new InventarioInfraestructuraDaoImpl();
+    private final AsignacionDao asignacionDao = new AsignacionDaoImpl();
+    private final ComunicadoDao comunicadoDao = new ComunicadoDaoImpl();
+    private final ReservaDao reservaDao = new ReservaDaoImpl(); // Inyección del nuevo DAO de reservas
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String view = request.getParameter("view");
+        try {
+            String modulo = request.getParameter("modulo");
+            String accion = request.getParameter("accion");
 
-        if ("maestro".equals(view)) {
-            // 1. Cargar el historial completo multi-registro
-            List<MaestroModel> historial = maestroDAO.listarHistorial();
-            request.setAttribute("historialMaestro", historial);
-
-            // 2. Gestionar el Modo Edición (CRUD): Si viene un idEdit, precargar. Si no, mandar vacío para limpiar.
-            String idEdit = request.getParameter("idEdit");
-            MaestroModel formularioObjeto = new MaestroModel();
-            if (idEdit != null) {
-                try {
-                    formularioObjeto = maestroDAO.obtenerPorId(Integer.parseInt(idEdit));
-                } catch (NumberFormatException e) { e.printStackTrace(); }
+            if (modulo == null) {
+                modulo = "inicio";
             }
-            request.setAttribute("configMaestra", formularioObjeto);
 
-        } else if ("inmuebles".equals(view)) {
-            // INTEGRACIÓN MÓDULO 2
-            // 1. Cargar las configuraciones maestras para que el usuario elija con cuál generar el inventario
-            List<MaestroModel> maestrosDisponibles = maestroDAO.listarHistorial();
-            request.setAttribute("listaMaestrosDisponibles", maestrosDisponibles);
+            logger.info("Cargando el panel general. Módulo solicitado: {}", modulo);
 
-            // 2. Cargar todo el inventario físico generado hasta el momento
-            List<InmuebleModel> listaInmuebles = inmuebleDAO.listarInmuebles();
-            request.setAttribute("listaInmuebles", listaInmuebles);
+            // MÓDULO 1: GESTIÓN DE USUARIOS
+            if ("usuarios".equals(modulo)) {
+                request.setAttribute("moduloActivo", "usuarios");
+                request.setAttribute("cssModulo", "usuarios.css");
 
-        } else if ("asignaciones".equals(view)) {
-            // INTEGRACIÓN MÓDULO 3
-            // 1. Cargar el padrón histórico de asignaciones vigentes (con los nombres de torre y unidad)
-            List<AsignacionModel> listaAsignaciones = asignacionDAO.listarAsignaciones();
-            request.setAttribute("listaAsignaciones", listaAsignaciones);
+                if ("editar".equals(accion) && request.getParameter("id") != null) {
+                    int idEditar = Integer.parseInt(request.getParameter("id"));
+                    Usuario u = usuarioDao.obtenerPorId(idEditar);
+                    request.setAttribute("usuarioSelected", u);
+                }
 
-            // 2. Cargar únicamente los departamentos o cocheras que estén libres ('VACANTE') para el formulario
-            List<InmuebleModel> vacantes = asignacionDAO.listarInmueblesVacantes();
-            request.setAttribute("listaInmueblesVacantes", vacantes);
+                List<Usuario> lista = usuarioDao.listarTodos();
+                request.setAttribute("usuarios", lista);
 
-        } else if ("recibos".equals(view)) {
-            // INTEGRACIÓN MÓDULO 4: RECIBOS Y ESTADO DE PAGO
-            // 1. Cargar el histórico completo de cuentas de mantenimiento generadas
-            List<ReciboModel> listaRecibos = reciboDAO.listarRecibos();
-            request.setAttribute("listaRecibos", listaRecibos);
+                // MÓDULO 2: CONFIGURACIÓN MAESTRA DEL CONDOMINIO
+            } else if ("configuracion".equals(modulo)) {
+                request.setAttribute("moduloActivo", "configuracion");
+                request.setAttribute("cssModulo", "configuracion.css");
 
-        } else if ("visitas".equals(view)) {
-            // INTEGRACIÓN MÓDULO 5: CONTROL DE VISITAS Y PERMANENCIA (SEGURIDAD AUDITABLE)
-            // 1. Cargar la bitácora histórica de ingresos (tanto EN_CURSO como FINALIZADOS)
-            List<VisitaModel> listaVisitas = visitaDAO.listarVisitasRecientes();
-            request.setAttribute("listaVisitas", listaVisitas);
+                if ("editar".equals(accion) && request.getParameter("id") != null) {
+                    int idEditar = Integer.parseInt(request.getParameter("id"));
+                    Configuracion c = configuracionDao.obtenerPorId(idEditar);
+                    request.setAttribute("configSeleccionada", c);
+                }
 
-            // 2. Cargar el mapa de inmuebles registrados para que sirvan como unidades destino en el selector
-            List<InmuebleModel> listaInmueblesDestino = visitaDAO.listarTodosLosInmuebles();
-            request.setAttribute("listaInmueblesDestino", listaInmueblesDestino);
+                List<Configuracion> listaConfig = configuracionDao.listarTodas();
+                request.setAttribute("configuraciones", listaConfig);
 
-        } else if ("mesa_ayuda".equals(view)) {
-            // INTEGRACIÓN MÓDULO 6: MESA DE AYUDA / INCIDENCIAS
-            // 1. Cargar la lista de tickets reportados con prioridades y estados
-            List<IncidenciaModel> listaIncidencias = incidenciaDAO.listarIncidencias();
-            request.setAttribute("listaIncidencias", listaIncidencias);
+                // MÓDULO 3: INVENTARIO MAESTRO DE INFRAESTRUCTURA
+            } else if ("infraestructura".equals(modulo)) {
+                request.setAttribute("moduloActivo", "infraestructura");
+                request.setAttribute("cssModulo", "infraestructura.css");
 
-            // 2. Cargar los inmuebles para mapear la unidad que reporta el desperfecto
-            List<InmuebleModel> listaInmueblesOrigen = visitaDAO.listarTodosLosInmuebles();
-            request.setAttribute("listaInmueblesOrigen", listaInmueblesOrigen);
+                if ("editar".equals(accion) && request.getParameter("id") != null) {
+                    int idEditar = Integer.parseInt(request.getParameter("id"));
+                    InventarioInfraestructura inv = infraestructuraDao.obtenerPorId(idEditar);
+                    request.setAttribute("infraSeleccionada", inv);
+                }
 
-        } else if ("reservas".equals(view)) {
-            // INTEGRACIÓN MÓDULO 8: RESERVAS DE ÁREAS COMUNES
-            // 1. Cargar la agenda consolidada de separaciones de espacios
-            List<ReservaModel> listaReservas = reservaDAO.listarReservas();
-            request.setAttribute("listaReservas", listaReservas);
+                List<InventarioInfraestructura> listaInfra = infraestructuraDao.listarTodo();
+                request.setAttribute("inventario", listaInfra);
 
-            // 2. Cargar el padrón de inmuebles para identificar a la unidad solicitante
-            List<InmuebleModel> listaInmueblesSolicitantes = visitaDAO.listarTodosLosInmuebles();
-            request.setAttribute("listaInmueblesSolicitantes", listaInmueblesSolicitantes);
+                List<Configuracion> listaConfig = configuracionDao.listarTodas();
+                request.setAttribute("configuraciones", listaConfig);
 
-        } else if ("usuarios".equals(view)) {
-            // INTEGRACIÓN MÓDULO 3 (RBAC): GESTIÓN DE USUARIOS Y ROLES
-            // 1. Cargar el listado completo de operadores y residentes registrados
-            List<UsuarioModel> listaUsuarios = usuarioDAO.listarUsuarios();
-            request.setAttribute("listaUsuarios", listaUsuarios);
+                // MÓDULO 4: ASIGNACIONES DE UNIDADES (PROPIETARIOS / INQUILINOS)
+            } else if ("asignaciones".equals(modulo)) {
+                request.setAttribute("moduloActivo", "asignaciones");
+                request.setAttribute("cssModulo", "asignaciones.css");
+
+                if ("editar".equals(accion) && request.getParameter("id") != null) {
+                    int idEditar = Integer.parseInt(request.getParameter("id"));
+                    Asignacion asig = asignacionDao.obtenerPorId(idEditar);
+                    request.setAttribute("asignacionSeleccionada", asig);
+                }
+
+                List<Asignacion> listaAsignaciones = asignacionDao.listarTodas();
+                request.setAttribute("asignaciones", listaAsignaciones);
+
+                List<Usuario> listaUsuarios = usuarioDao.listarTodos();
+                request.setAttribute("usuarios", listaUsuarios);
+
+                List<InventarioInfraestructura> listaInfra = infraestructuraDao.listarTodo();
+                request.setAttribute("inventario", listaInfra);
+
+                // MÓDULO 5: COMUNICADOS E INFORMES DEL CONDOMINIO
+            } else if ("comunicados".equals(modulo)) {
+                request.setAttribute("moduloActivo", "comunicados");
+                request.setAttribute("cssModulo", "comunicados.css");
+
+                if ("editar".equals(accion) && request.getParameter("id") != null) {
+                    int idEditar = Integer.parseInt(request.getParameter("id"));
+                    Comunicado com = comunicadoDao.obtenerPorId(idEditar);
+                    request.setAttribute("comunicadoSeleccionado", com);
+                }
+
+                List<Comunicado> listaComunicados = comunicadoDao.listarTodos();
+                request.setAttribute("comunicados", listaComunicados);
+
+                List<InventarioInfraestructura> listaInfra = infraestructuraDao.listarTodo();
+                request.setAttribute("inventario", listaInfra);
+
+                // MÓDULO 6: RESERVAS DE ÁREAS COMUNES
+            } else if ("reservas".equals(modulo)) {
+                request.setAttribute("moduloActivo", "reservas");
+                request.setAttribute("cssModulo", "reservas.css");
+
+                // 1. Historial completo de reservas con JOINS mapeados
+                List<Reserva> listaReservas = reservaDao.listarTodas();
+                request.setAttribute("reservas", listaReservas);
+
+                // 2. Residentes/Usuarios disponibles para asociar al combo select
+                List<Usuario> listaUsuarios = usuarioDao.listarTodos();
+                request.setAttribute("usuarios", listaUsuarios);
+
+                // 3. Infraestructura disponible (Parrillas, Salones, Canchas, etc.)
+                List<InventarioInfraestructura> listaInfra = infraestructuraDao.listarTodo();
+                request.setAttribute("inventario", listaInfra);
+
+                // Capturar alerta de error por agenda duplicada si existe
+                if ("duplicado".equals(request.getParameter("error"))) {
+                    request.setAttribute("alertaError", "El área seleccionada ya se encuentra reservada en esa fecha y turno.");
+                }
+
+                // VISTA POR DEFECTO
+            } else {
+                request.setAttribute("moduloActivo", "dashboard");
+                request.setAttribute("cssModulo", null);
+            }
+
+            request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            logger.error("Error al renderizar el esqueleto del Dashboard", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al procesar el esqueleto del panel.");
         }
+    }
 
-        request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
     }
 }

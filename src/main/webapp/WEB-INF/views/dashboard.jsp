@@ -1,181 +1,104 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.habitech.model.UsuarioModel" %>
-
-<%
-    // 1. Recuperamos la vista solicitada por parámetro
-    String view = request.getParameter("view");
-    if (view == null) view = "home";
-
-    // 2. Recuperamos el objeto usuario de la sesión para la validación RBAC
-    UsuarioModel usuarioSesion = (UsuarioModel) session.getAttribute("usuarioSesion");
-    String nombreUsuario = (usuarioSesion != null) ? usuarioSesion.getNombres() + " " + usuarioSesion.getApellidos() : "Invitado";
-    String rolActual = (usuarioSesion != null) ? usuarioSesion.getRol() : "";
-%>
-
-<html>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <title>Habitech Sistema</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habitech - Panel de Control</title>
 
-    <%-- Estilo aislado exclusivo para el Módulo Maestro --%>
-    <% if ("maestro".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/maestro.css">
-    <% } %>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/dashboard.css">
 
-    <%-- Estilo aislado exclusivo para el Módulo de Inmuebles --%>
-    <% if ("inmuebles".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/inmuebles.css">
-    <% } %>
-
-    <%-- Estilo aislado exclusivo para el Módulo de Asignación de Viviendas --%>
-    <% if ("asignaciones".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/asignaciones.css">
-    <% } %>
-
-    <%-- Estilo aislado exclusivo para el Módulo de Recibos y Pagos --%>
-    <% if ("recibos".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/recibos.css">
-    <% } %>
-
-    <%-- INTEGRACIÓN MÓDULO 5: Estilo aislado exclusivo para el Control de Visitas --%>
-    <% if ("visitas".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/visitas.css">
-    <% } %>
-
-    <%-- INTEGRACIÓN MÓDULO 6: Estilo aislado exclusivo para la Mesa de Ayuda --%>
-    <% if ("mesa_ayuda".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/mesa_ayuda.css">
-    <% } %>
-
-    <%-- INTEGRACIÓN MÓDULO 8: Estilo aislado exclusivo para Reservas de Áreas Comunes --%>
-    <% if ("reservas".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/reservas.css">
-    <% } %>
-
-    <%-- INTEGRACIÓN MÓDULO 3: Estilo aislado exclusivo para la Gestión de Usuarios Seguro --%>
-    <% if ("usuarios".equals(view)) { %>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/usuarios.css">
-    <% } %>
+    <%-- Carga dinámica del CSS según lo que indique el controlador --%>
+    <c:if test="${not empty cssModulo}">
+        <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/${cssModulo}">
+    </c:if>
 </head>
-
 <body>
 
-<div class="header" style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
-    <h2>Habitech - Sistema de Gestión</h2>
-    <div class="user-info" style="color: white; font-size: 14px;">
-        <span>👤 Bienvenido, <strong><%= nombreUsuario %></strong></span>
-        <a href="${pageContext.request.contextPath}/auth" style="color: #f87171; margin-left: 15px; text-decoration: none; font-weight: 600;">Automático 🚪 Cerrar Sesión</a>
-    </div>
-</div>
+    <header class="dashboard-header">
+        <div class="header-logo">
+            <h1>Habitech</h1>
+        </div>
+        <div class="header-info">
+            <span class="condominio-nombre">Condominio Altos de la Ensenada</span>
 
-<div class="layout">
-
-    <div class="sidebar">
-        <a href="dashboard?view=home" class="<%= "home".equals(view) ? "active" : "" %>">🏠 Dashboard</a>
-
-        <%
-            // Control de visibilidad estricto exclusivo para ADMINISTRADORES
-            if ("ADMIN_SISTEMA".equals(rolActual)) {
-        %>
-            <a href="dashboard?view=maestro" class="<%= "maestro".equals(view) ? "active" : "" %>">⚙️ Maestro</a>
-            <a href="dashboard?view=usuarios" class="<%= "usuarios".equals(view) ? "active" : "" %>">👤 Usuarios</a>
-        <%
-            }
-        %>
-
-        <%
-            // Control de visibilidad para Personal Operativo (Administradores y Conserjes)
-            if ("ADMIN_SISTEMA".equals(rolActual) || "CONSERJE".equals(rolActual)) {
-        %>
-            <a href="dashboard?view=inmuebles" class="<%= "inmuebles".equals(view) ? "active" : "" %>">🏢 Inmuebles</a>
-            <a href="dashboard?view=asignaciones" class="<%= "asignaciones".equals(view) ? "active" : "" %>">🔑 Asignación de viviendas</a>
-            <a href="dashboard?view=recibos" class="<%= "recibos".equals(view) ? "active" : "" %>">💵 Recibo y estado de pago</a>
-            <a href="dashboard?view=visitas" class="<%= "visitas".equals(view) ? "active" : "" %>">🛂 Control de visitas</a>
-        <%
-            }
-        %>
-
-        <a href="dashboard?view=mesa_ayuda" class="<%= "mesa_ayuda".equals(view) ? "active" : "" %>">🔧 Mesa de ayuda</a>
-        <a href="dashboard?view=reservas" class="<%= "reservas".equals(view) ? "active" : "" %>">📆 Reservas de áreas comunes</a>
-    </div>
-
-    <div class="content">
-
-        <%
-            if ("maestro".equals(view)) {
-                if ("ADMIN_SISTEMA".equals(rolActual)) {
-        %>
-                    <jsp:include page="/WEB-INF/views/maestro.jsp" />
-        <%
-                } else {
-                    out.println("<h2 style='color:#991b1b; padding:20px;'>⚠️ Acceso Restringido: Se requieren privilegios de Administrador del Sistema.</h2>");
-                }
-            } else if ("inmuebles".equals(view)) {
-                if ("ADMIN_SISTEMA".equals(rolActual) || "CONSERJE".equals(rolActual)) {
-        %>
-                    <jsp:include page="/WEB-INF/views/inmuebles.jsp" />
-        <%
-                } else {
-                    out.println("<h2 style='color:#991b1b; padding:20px;'>⚠️ Acceso Restringido: Vista exclusiva para personal operativo autorizado.</h2>");
-                }
-            } else if ("asignaciones".equals(view)) {
-                if ("ADMIN_SISTEMA".equals(rolActual) || "CONSERJE".equals(rolActual)) {
-        %>
-                    <jsp:include page="/WEB-INF/views/asignaciones.jsp" />
-        <%
-                } else {
-                    out.println("<h2 style='color:#991b1b; padding:20px;'>⚠️ Acceso Restringido: Vista exclusiva para personal operativo autorizado.</h2>");
-                }
-            } else if ("recibos".equals(view)) {
-                if ("ADMIN_SISTEMA".equals(rolActual) || "CONSERJE".equals(rolActual)) {
-        %>
-                    <jsp:include page="/WEB-INF/views/recibos.jsp" />
-        <%
-                } else {
-                    out.println("<h2 style='color:#991b1b; padding:20px;'>⚠️ Acceso Restringido: Vista exclusiva para personal operativo autorizado.</h2>");
-                }
-            } else if ("visitas".equals(view)) {
-                if ("ADMIN_SISTEMA".equals(rolActual) || "CONSERJE".equals(rolActual)) {
-        %>
-                    <jsp:include page="/WEB-INF/views/visitas.jsp" />
-        <%
-                } else {
-                    out.println("<h2 style='color:#991b1b; padding:20px;'>⚠️ Acceso Restringido: Vista exclusiva para personal operativo autorizado.</h2>");
-                }
-            } else if ("mesa_ayuda".equals(view)) {
-        %>
-                <jsp:include page="/WEB-INF/views/mesa_ayuda.jsp" />
-        <%
-            } else if ("reservas".equals(view)) {
-        %>
-                <jsp:include page="/WEB-INF/views/reservas.jsp" />
-        <%
-            } else if ("usuarios".equals(view)) {
-                if ("ADMIN_SISTEMA".equals(rolActual)) {
-        %>
-                    <jsp:include page="/WEB-INF/views/usuarios.jsp" />
-        <%
-                } else {
-                    out.println("<h2 style='color:#991b1b; padding:20px;'>⚠️ Seguridad RBAC: No cuenta con permisos de auditoría sobre credenciales de usuarios.</h2>");
-                }
-            } else {
-        %>
-            <h1>Dashboard</h1>
-
-            <div class="card">
-                <p>Bienvenido al sistema Habitech, <strong><%= nombreUsuario %></strong>. Su sesión ha sido iniciada con el rol: <code><%= rolActual %></code> ✅</p>
+            <div class="usuario-perfil">
+                <span class="usuario-nombre">Carlos Mendoza</span>
+                <span class="usuario-rol">ADMIN_SISTEMA</span>
             </div>
-        <%
-            }
-        %>
+            <a href="#" class="btn-logout">Cerrar Sesión</a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+
+        <aside class="dashboard-sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <%-- Enlaces del ecosistema Habitech pasando por el DashboardController --%>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=usuarios" class="nav-link">Usuarios</a></li>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=configuracion" class="nav-link">Configuración</a></li>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=infraestructura" class="nav-link">Infraestructura</a></li>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=asignaciones" class="nav-link">Asignaciones</a></li>
+                    <li><a href="#" class="nav-link">Recibos</a></li>
+                    <li><a href="#" class="nav-link">Visitas</a></li>
+                    <li><a href="#" class="nav-link">Incidencias</a></li>
+                    <%-- ENLACE INTEGRADO: Módulo de Reservas --%>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=reservas" class="nav-link">Reservas</a></li>
+                    <%-- ENLACE INTEGRADO: Módulo de Comunicados --%>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=comunicados" class="nav-link">Comunicados</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="dashboard-content">
+            <c:choose>
+                <%-- Evaluamos el atributo moduloActivo del controlador --%>
+                <c:when test="${moduloActivo == 'usuarios'}">
+                    <jsp:include page="usuarios.jsp" />
+                </c:when>
+
+                <%-- Renderizado dinámico del módulo de Configuración Maestra --%>
+                <c:when test="${moduloActivo == 'configuracion'}">
+                    <jsp:include page="configuracion.jsp" />
+                </c:when>
+
+                <%-- Renderizado dinámico del módulo de Inventario Maestro de Infraestructura --%>
+                <c:when test="${moduloActivo == 'infraestructura'}">
+                    <jsp:include page="infraestructura.jsp" />
+                </c:when>
+
+                <%-- Renderizado dinámico del módulo de Asignaciones (Contratos/Ocupación) --%>
+                <c:when test="${moduloActivo == 'asignaciones'}">
+                    <jsp:include page="asignaciones.jsp" />
+                </c:when>
+
+                <%-- INTEGRACIÓN: Renderizado del módulo de Reservas --%>
+                <c:when test="${moduloActivo == 'reservas'}">
+                    <jsp:include page="reservas.jsp" />
+                </c:when>
+
+                <%-- INTEGRACIÓN: Renderizado del módulo de Comunicados --%>
+                <c:when test="${moduloActivo == 'comunicados'}">
+                    <jsp:include page="comunicados.jsp" />
+                </c:when>
+
+                <%-- VISTA POR DEFECTO --%>
+                <c:otherwise>
+                    <div style="padding: 40px; text-align: center; color: #94a3b8;">
+                        <h2 style="color: #38bdf8; margin-bottom: 10px;">¡Bienvenido al Panel Administrativo!</h2>
+                        <p>Selecciona una opción del menú lateral para comenzar la gestión de Habitech.</p>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </main>
 
     </div>
 
-</div>
-
-<div class="footer">
-    <p>© 2026 Habitech - Todos los derechos reservados</p>
-</div>
+    <footer class="dashboard-footer">
+        <p>&copy; 2026 Habitech - Sistema de Gestión de Condominios. Todos los derechos reservados.</p>
+    </footer>
 
 </body>
 </html>

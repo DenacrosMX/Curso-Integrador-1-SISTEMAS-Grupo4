@@ -1,127 +1,170 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.habitech.model.AsignacionModel" %>
-<%@ page import="com.habitech.model.InmuebleModel" %>
-<%@ page import="java.util.List" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%
-    List<AsignacionModel> listaAsignaciones = (List<AsignacionModel>) request.getAttribute("listaAsignaciones");
-    List<InmuebleModel> vacantes = (List<InmuebleModel>) request.getAttribute("listaInmueblesVacantes");
+<div class="modulo-contenedor">
 
-    String mensajeExito = (String) session.getAttribute("mensajeExito");
-    String mensajeError = (String) session.getAttribute("mensajeError");
-    session.removeAttribute("mensajeExito");
-    session.removeAttribute("mensajeError");
-%>
+    <%-- FORMULARIO DE ASIGNACIÓN / CONTRATO --%>
+    <div class="card-formulario">
+        <h2>
+            <c:choose>
+                <c:when test="${not empty asignacionSeleccionada}">Modificar Contrato de Asignación</c:when>
+                <c:otherwise>Registrar Nueva Asignación de Unidad</c:otherwise>
+            </c:choose>
+        </h2>
 
-<% if (mensajeExito != null) { %>
-    <div class="alert alert-success"><%= mensajeExito %></div>
-<% } %>
-<% if (mensajeError != null) { %>
-    <div class="alert alert-danger"><%= mensajeError %></div>
-<% } %>
+        <form action="${pageContext.request.contextPath}/asignaciones" method="POST" class="form-habitech">
+            <%-- ID oculto para actualización --%>
+            <input type="hidden" name="id" value="${asignacionSeleccionada.id}">
+            <input type="hidden" name="estado" value="${not empty asignacionSeleccionada ? asignacionSeleccionada.estado : 'ACTIVO'}">
 
-<div class="modulo-asignaciones">
-    <div class="header-modulo">
-        <h1 class="titulo-modulo">🔑 Asignación de Viviendas e Inmuebles</h1>
-        <p class="descripcion-modulo">Vincule los departamentos y cocheras autogenerados con sus respectivos propietarios o inquilinos encargados.</p>
-    </div>
-
-    <div class="bloque-split">
-        <div class="card-formulario">
-            <h3>📝 Registrar Nueva Ocupación</h3>
-            <form action="${pageContext.request.contextPath}/asignaciones" method="POST" class="form-habitech">
-                <input type="hidden" name="action" value="registrar">
-
-                <div class="grupo-campo">
-                    <label>Unidad Inmobiliaria Libre:</label>
-                    <select name="inmuebleId" required class="input-control">
-                        <option value="">-- Seleccionar Unidad Vacante --</option>
-                        <% if (vacantes != null && !vacantes.isEmpty()) {
-                            for (InmuebleModel v : vacantes) { %>
-                                <option value="<%= v.getId() %>">
-                                    <%= v.getBloqueTorre() %> - <%= v.getTipoUnidad() %> Nro <%= v.getNroUnidad() %>
-                                </option>
-                            <% }
-                        } else { %>
-                            <option value="" disabled>No hay unidades vacantes disponibles</option>
-                        <% } %>
+            <div class="form-row">
+                <%-- Selector de Usuarios --%>
+                <div class="form-group col-4">
+                    <label for="usuarioId">Usuario / Residente</label>
+                    <select name="usuarioId" id="usuarioId" required class="form-control">
+                        <option value="">-- Seleccione Habitante --</option>
+                        <c:forEach var="usr" items="${usuarios}">
+                            <%-- CORRECCIÓN: Se cambió usr.nombre por usr.nombres --%>
+                            <option value="${usr.id}" <c:if test="${asignacionSeleccionada.usuarioId == usr.id}">selected</c:if>>
+                                ${usr.nombres} (${usr.rol})
+                            </option>
+                        </c:forEach>
                     </select>
                 </div>
 
-                <div class="grupo-campo">
-                    <label>Nombre Completo del Residente:</label>
-                    <input type="text" name="nombreResidente" placeholder="Ej: Juan Pérez Guerrero" required class="input-control">
-                </div>
-
-                <div class="grupo-campo">
-                    <label>Documento de Identidad (DNI/CE):</label>
-                    <input type="text" name="documentoIdentidad" placeholder="Ej: 74859612" required class="input-control">
-                </div>
-
-                <div class="grupo-campo">
-                    <label>Condición Legal de Ocupación:</label>
-                    <select name="tipoAdquisicion" required class="input-control">
-                        <option value="PROPIETARIO">PROPIETARIO</option>
-                        <option value="INQUILINO">INQUILINO</option>
+                <%-- Selector de Infraestructura Base --%>
+                <div class="form-group col-4">
+                    <label for="inventarioMaestroId">Estructura Base</label>
+                    <select name="inventarioMaestroId" id="inventarioMaestroId" required class="form-control">
+                        <option value="">-- Seleccione Bloque --</option>
+                        <c:forEach var="inf" items="${inventario}">
+                            <option value="${inf.id}" <c:if test="${asignacionSeleccionada.inventarioMaestroId == inf.id}">selected</c:if>>
+                                ${inf.torre} -
+                                <c:choose>
+                                    <c:when test="${inf.nroPiso < 0}">Sótano ${inf.nroPiso * -1}</c:when>
+                                    <c:when test="${inf.nroPiso == 0}">Planta Baja</c:when>
+                                    <c:otherwise>Piso ${inf.nroPiso}</c:otherwise>
+                                </c:choose>
+                                (${inf.tipoElemento})
+                            </option>
+                        </c:forEach>
                     </select>
                 </div>
 
-                <div class="grupo-campo">
-                    <label>Fecha de Entrega de Llaves / Ingreso:</label>
-                    <input type="date" name="fechaIngreso" value="<%= new java.sql.Date(System.currentTimeMillis()) %>" required class="input-control">
+                <%-- Código Específico de Unidad --%>
+                <div class="form-group col-4">
+                    <label for="codigoUnidadSpecificas">Código de Unidad Específica</label>
+                    <input type="text" name="codigoUnidadEspecifica" id="codigoUnidadSpecificas" placeholder="Ej: DPTO-101, COCHERA-05"
+                           value="${asignacionSeleccionada.codigoUnidadEspecifica}" required class="form-control">
                 </div>
-
-                <button type="submit" class="btn-guardar-asignacion">💾 Consolidar Ocupación</button>
-            </form>
-        </div>
-
-        <div class="card-tabla-datos">
-            <h3>👥 Padrón Actual de Residentes Activos</h3>
-            <div class="table-container">
-                <table class="tabla-habitech">
-                    <thead>
-                        <tr>
-                            <th>Ubicación</th>
-                            <th>Tipo</th>
-                            <th>Residente Responsable</th>
-                            <th>Documento</th>
-                            <th>Régimen</th>
-                            <th>Fecha Ingreso</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (listaAsignaciones != null && !listaAsignaciones.isEmpty()) {
-                            for (AsignacionModel a : listaAsignaciones) { %>
-                                <tr>
-                                    <td><strong><%= a.getInmueble().getBloqueTorre() %> - <%= a.getInmueble().getNroUnidad() %></strong></td>
-                                    <td><span class="badge-tipo-un"><%= a.getInmueble().getTipoUnidad() %></span></td>
-                                    <td><%= a.getNombreResidente() %></td>
-                                    <td><code><%= a.getDocumentoIdentidad() %></code></td>
-                                    <td>
-                                        <span class="badge-regimen <%= "PROPIETARIO".equals(a.getTipoAdquisicion()) ? "reg-prop" : "reg-inq" %>">
-                                            <%= a.getTipoAdquisicion() %>
-                                        </span>
-                                    </td>
-                                    <td><%= a.getFechaIngreso() %></td>
-                                    <td>
-                                        <form action="${pageContext.request.contextPath}/asignaciones" method="POST" style="margin:0;" onsubmit="return confirm('¿Liberar inmueble? El estado de la unidad cambiará a VACANTE.');">
-                                            <input type="hidden" name="action" value="eliminar">
-                                            <input type="hidden" name="idAsignacion" value="<%= a.getId() %>">
-                                            <input type="hidden" name="inmuebleId" value="<%= a.getInmuebleId() %>">
-                                            <button type="submit" class="btn-tabla-eliminar">❌ Desalojar</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }
-                        } else { %>
-                            <tr>
-                                <td colspan="7" class="text-center">No existen viviendas asignadas en este momento. El condominio se encuentra desocupado.</td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
             </div>
-        </div>
+
+            <div class="form-row">
+                <%-- Tipo de Adquisición --%>
+                <div class="form-group col-4">
+                    <label for="tipoAdquisicion">Tipo de Adquisición</label>
+                    <select name="tipoAdquisicion" id="tipoAdquisicion" required class="form-control">
+                        <option value="PROPIETARIO" <c:if test="${asignacionSeleccionada.tipoAdquisicion == 'PROPIETARIO'}">selected</c:if>>PROPIETARIO</option>
+                        <option value="INQUILINO" <c:if test="${asignacionSeleccionada.tipoAdquisicion == 'INQUILINO'}">selected</c:if>>INQUILINO</option>
+                        <option value="RESERVA" <c:if test="${asignacionSeleccionada.tipoAdquisicion == 'RESERVA'}">selected</c:if>>RESERVA</option>
+                    </select>
+                </div>
+
+                <%-- Precio Pactado --%>
+                <div class="form-group col-4">
+                    <label for="precioMensualPactado">Precio Mensual Pactado</label>
+                    <input type="number" name="precioMensualPactado" id="precioMensualPactado" step="0.01" min="0" placeholder="0.00"
+                           value="${not empty asignacionSeleccionada ? asignacionSeleccionada.precioMensualPactado : '0.00'}" required class="form-control">
+                </div>
+
+                <%-- Fecha de Ingreso --%>
+                <div class="form-group col-4">
+                    <label for="fechaIngreso">Fecha de Ingreso / Contrato</label>
+                    <input type="date" name="fechaIngreso" id="fechaIngreso"
+                           value="${not empty asignacionSeleccionada ? asignacionSeleccionada.fechaIngreso : '2026-06-07'}" required class="form-control">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <c:if test="${not empty asignacionSeleccionada}">
+                    <a href="${pageContext.request.contextPath}/dashboard?modulo=asignaciones" class="btn-secondary">Cancelar Edición</a>
+                </c:if>
+                <button type="submit" class="btn-primary">
+                    <c:choose>
+                        <c:when test="${not empty asignacionSeleccionada}">Actualizar Contrato</c:when>
+                        <c:otherwise>📋 Confirmar Asignación</c:otherwise>
+                    </c:choose>
+                </button>
+            </div>
+        </form>
     </div>
+
+    <%-- TABLA DE ASIGNACIONES HISTÓRICAS Y ACTIVAS --%>
+    <div class="card-tabla">
+        <h2>Historial de Asignaciones y Ocupación</h2>
+        <table class="tabla-habitech">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Residente / Usuario</th>
+                    <th>Estructura General</th>
+                    <th>Unidad Real</th>
+                    <th>Adquisición</th>
+                    <th>Precio Pactado</th>
+                    <th>Ingreso</th>
+                    <th>Salida</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:choose>
+                    <c:when test="${not empty asignaciones}">
+                        <c:forEach var="asig" items="${asignaciones}">
+                            <tr>
+                                <td>${asig.id}</td>
+                                <td class="text-bold">${asig.nombreUsuario}</td>
+                                <td>${asig.detalleInfraestructura}</td>
+                                <td><span class="badge-cantidad">${asig.codigoUnidadEspecifica}</span></td>
+                                <td><span class="badge-tipo">${asig.tipoAdquisicion}</span></td>
+                                <td class="text-bold">S/. ${asig.precioMensualPactado}</td>
+                                <td>${asig.fechaIngreso}</td>
+                                <td>${not empty asig.fechaSalida ? asig.fechaSalida : '-'}</td>
+                                <td>
+                                    <span class="badge-estado ${asig.estado == 'ACTIVO' ? 'activo' : 'inactivo'}">
+                                        ${asig.estado}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="acciones-iconos">
+                                        <c:if var="esActivo" test="${asig.estado == 'ACTIVO'}">
+                                            <%-- Editar Contrato Activo --%>
+                                            <a href="${pageContext.request.contextPath}/dashboard?modulo=asignaciones&accion=editar&id=${asig.id}" class="icon-edit" title="Modificar Datos">
+                                                ✏️
+                                            </a>
+                                            <%-- Finalizar Contrato (Baja contractual) --%>
+                                            <a href="${pageContext.request.contextPath}/asignaciones?accion=finalizar&id=${asig.id}"
+                                               class="icon-delete" title="Finalizar Contrato / Desocupar"
+                                               onclick="return confirm('¿Está seguro de finalizar este contrato de asignación? Se registrará la fecha de salida de hoy de forma automática.');">
+                                                🛑
+                                            </a>
+                                        </c:if>
+                                        <c:if test="${!esActivo}">
+                                            <span style="font-size: 0.85em; color: #64748b; font-style: italic;">Histórico</span>
+                                        </c:if>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <tr>
+                            <td colspan="10" class="tabla-vacia">No existen asignaciones de unidades registradas en el sistema.</td>
+                        </tr>
+                    </c:otherwise>
+                </c:choose>
+            </tbody>
+        </table>
+    </div>
+
 </div>

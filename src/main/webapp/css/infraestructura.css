@@ -1,0 +1,243 @@
+/* ==========================================================================
+   MÓDULO DE INVENTARIO DE INFRAESTRUCTURA - HABITECH (DARK THEME)
+   ========================================================================== */
+
+/* Contenedor General */
+.modulo-contenedor {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Animación de entrada suave */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------------------------------------------------------------------
+   1. TARJETAS (CARDS) DE FORMULARIO Y TABLA
+   -------------------------------------------------------------------------- */
+.card-formulario, .card-tabla {
+    background-color: #1e293b; /* Pizarra oscuro */
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.card-formulario h2, .card-tabla h2 {
+    color: #38bdf8; /* Azul Neón */
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   2. DISEÑO DEL FORMULARIO (GRID & INPUTS)
+   -------------------------------------------------------------------------- */
+.form-habitech {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Clases de ancho de columnas */
+.col-4 { flex: 1 1 calc(33.333% - 14px); min-width: 200px; }
+.col-6 { flex: 1 1 calc(50% - 10px); min-width: 250px; }
+
+.form-group label {
+    color: #94a3b8; /* Texto secundario gris */
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-control {
+    background-color: #0f172a; /* Fondo más oscuro para inputs */
+    border: 1px solid #475569;
+    border-radius: 8px;
+    color: #f8fafc;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Focus con resplandor cian */
+.form-control:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+select.form-control {
+    cursor: pointer;
+}
+
+select.form-control option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+/* Botones de Acción */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-primary {
+    background-color: #0284c7;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0369a1;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background-color: #475569;
+    border: none;
+    border-radius: 8px;
+    color: #f8fafc;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #334155;
+}
+
+/* --------------------------------------------------------------------------
+   3. DISEÑO DE LA TABLA DE HISTORIAL
+   -------------------------------------------------------------------------- */
+.tabla-habitech {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.tabla-habitech th {
+    background-color: #0f172a;
+    color: #38bdf8;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 2px solid #334155;
+}
+
+.tabla-habitech td {
+    padding: 14px 16px;
+    color: #e2e8f0;
+    border-bottom: 1px solid #334155;
+    vertical-align: middle;
+}
+
+.tabla-habitech tbody tr:hover {
+    background-color: rgba(51, 65, 85, 0.3); /* Resaltado sutil al pasar el mouse */
+}
+
+.text-bold {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   4. ESTILOS DE BADGES (ETIQUETAS) Y ICONOS
+   -------------------------------------------------------------------------- */
+.badge-tipo {
+    background-color: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #38bdf8;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.badge-cantidad {
+    background-color: #334155;
+    color: #f8fafc;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-estado {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.badge-estado.activo {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-estado.inactivo {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Acciones (Iconos) */
+.acciones-iconos {
+    display: flex;
+    gap: 14px;
+}
+
+.acciones-iconos a {
+    text-decoration: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    display: inline-block;
+}
+
+.acciones-iconos a:hover {
+    transform: scale(1.2);
+}
+
+/* Estado de Tabla Vacía */
+.tabla-vacia {
+    text-align: center;
+    color: #64748b;
+    padding: 30px !important;
+    font-style: italic;
+}

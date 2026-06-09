@@ -1,135 +1,147 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.habitech.model.ReservaModel" %>
-<%@ page import="com.habitech.model.InmuebleModel" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.habitech.model.Reserva" %>
+<%@ page import="com.habitech.model.Usuario" %>
+<%@ page import="com.habitech.model.InventarioInfraestructura" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-
+<%@ page import="java.time.format.DateTimeFormatter" %>
 <%
-    List<ReservaModel> listaReservas = (List<ReservaModel>) request.getAttribute("listaReservas");
-    List<InmuebleModel> listaInmueblesSolicitantes = (List<InmuebleModel>) request.getAttribute("listaInmueblesSolicitantes");
-    String mensajeExito = (String) session.getAttribute("mensajeExito");
-    String mensajeError = (String) session.getAttribute("mensajeError");
-    session.removeAttribute("mensajeExito");
-    session.removeAttribute("mensajeError");
+    // Listas inyectadas por el DashboardController
+    List<Reserva> listaReservas = (List<Reserva>) request.getAttribute("reservas");
+    List<Usuario> listaUsuarios = (List<Usuario>) request.getAttribute("usuarios");
+    List<InventarioInfraestructura> listaInfra = (List<InventarioInfraestructura>) request.getAttribute("inventario");
 
-    SimpleDateFormat sdfFecha = new SimpleDateFormat("dd/MM/yyyy");
-    SimpleDateFormat sdfRegistro = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    // Captura de errores de cruce de agenda
+    String alertaError = (String) request.getAttribute("alertaError");
+
+    // Formateadores de fecha
+    DateTimeFormatter formFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    DateTimeFormatter formRegistro = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 %>
 
-<% if (mensajeExito != null) { %>
-    <div class="alert alert-success" style="padding: 12px; margin-bottom: 15px; background-color: #d1e7dd; color: #0f5132; border-radius: 4px; font-weight: 600;">
-        <%= mensajeExito %>
-    </div>
-<% } %>
-<% if (mensajeError != null) { %>
-    <div class="alert alert-danger" style="padding: 12px; margin-bottom: 15px; background-color: #f8d7da; color: #842029; border-radius: 4px; font-weight: 600;">
-        <%= mensajeError %>
-    </div>
-<% } %>
+<div class="modulo-container">
 
-<div class="modulo-reservas">
-    <div class="header-modulo">
-        <h2 class="titulo-modulo">📆 Agenda y Reservas de Áreas Comunes</h2>
-        <p class="descripcion-modulo">Evite colisiones de horarios controlando el usufructo de los espacios comunes del condominio bajo bloques de tiempo estrictos.</p>
-    </div>
-
-    <div class="bloque-split">
-        <div class="card-formulario">
-            <h3>📝 Programar Nueva Separación</h3>
-            <form action="${pageContext.request.contextPath}/reservas" method="POST" class="form-habitech">
-                <input type="hidden" name="action" value="reservar">
-
-                <div class="grupo-campo">
-                    <label>Unidad Habitacional del Solicitante:</label>
-                    <select name="inmuebleId" required class="input-control">
-                        <option value="">-- Seleccionar Vivienda --</option>
-                        <% if (listaInmueblesSolicitantes != null) {
-                            for (InmuebleModel inm : listaInmueblesSolicitantes) { %>
-                                <option value="<%= inm.getId() %>">
-                                    <%= inm.getBloqueTorre() %> - <%= inm.getNroUnidad() %>
-                                </option>
-                            <% }
-                        } %>
-                    </select>
-                </div>
-
-                <div class="grupo-campo">
-                    <label>Espacio Común a Solicitar:</label>
-                    <select name="areaComun" required class="input-control">
-                        <option value="PARRILLA">🍖 PARRILLA</option>
-                        <option value="SALON_EVENTOS">🎉 SALÓN DE EVENTOS</option>
-                        <option value="GIMNASIO">🏋️ GIMNASIO</option>
-                    </select>
-                </div>
-
-                <div class="grupo-campo">
-                    <label>Fecha del Evento / Uso:</label>
-                    <input type="date" name="fechaReserva" required class="input-control">
-                </div>
-
-                <div class="grupo-campo">
-                    <label>Bloque Horario / Turno:</label>
-                    <select name="turno" required class="input-control">
-                        <option value="MAÑANA">🌅 MAÑANA (08:00 AM - 02:00 PM)</option>
-                        <option value="NOCHE">🌃 NOCHE (04:00 PM - 10:00 PM)</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn-registrar-reserva">Confirmar Separación</button>
-            </form>
+    <% if (alertaError != null) { %>
+        <div class="alerta-error">
+            ⚠️ <strong>Error de Agenda:</strong> <%= alertaError %>
         </div>
+    <% } %>
 
-        <div class="card-tabla-datos">
-            <h3>📋 Agenda Consolidada de Eventos</h3>
-            <div class="table-container">
-                <table class="tabla-habitech">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Espacio Común</th>
-                            <th>Residente Solicitante</th>
-                            <th>Fecha Evento</th>
-                            <th>Turno Asignado</th>
-                            <th>Registro Auditoría</th>
-                            <th>Operación</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (listaReservas != null && !listaReservas.isEmpty()) {
-                            for (ReservaModel r : listaReservas) {
+    <div class="card-formulario">
+        <h2>Registrar Nueva Reserva de Área Común</h2>
+
+        <form action="${pageContext.request.contextPath}/reservas" method="POST">
+            <input type="hidden" name="estado" value="PROBADA">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Residente Solicitante</label>
+                    <select name="usuario_id" required>
+                        <option value="">-- Seleccione el Residente --</option>
+                        <%
+                            if (listaUsuarios != null) {
+                                for (Usuario u : listaUsuarios) {
                         %>
-                                <tr>
-                                    <td><code>#RES-<%= r.getId() %></code></td>
-                                    <td>
-                                        <span class="badge-area area-<%= r.getAreaComun().toLowerCase() %>">
-                                            <%= r.getAreaComun().replace("_", " ") %>
-                                        </span>
-                                    </td>
-                                    <td><strong><%= r.getInmueble().getBloqueTorre() %> - <%= r.getInmueble().getNroUnidad() %></strong></td>
-                                    <td><span class="fecha-destacada">📅 <%= sdfFecha.format(r.getFechaReserva()) %></span></td>
-                                    <td>
-                                        <span class="badge-turno turno-<%= r.getTurno().toLowerCase() %>">
-                                            <%= r.getTurno() %>
-                                        </span>
-                                    </td>
-                                    <td><small class="text-muted"><%= sdfRegistro.format(r.getFechaRegistro()) %></small></td>
-                                    <td>
-                                        <form action="${pageContext.request.contextPath}/reservas" method="POST" style="margin:0;" onsubmit="return confirm('¿Está seguro de que desea liberar esta fecha en la agenda?');">
-                                            <input type="hidden" name="action" value="cancelar">
-                                            <input type="hidden" name="idReserva" value="<%= r.getId() %>">
-                                            <button type="submit" class="btn-cancelar-reserva">Anular</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <% }
-                        } else { %>
-                            <tr>
-                                <td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">No existen separaciones registradas en la agenda de áreas comunes.</td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
+                                    <option value="<%= u.getId() %>"><%= u.getNombres() %> <%= u.getApellidos() %> (<%= u.getRol() %>)</option>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Área Común Requerida</label>
+                    <select name="inventario_maestro_id" required>
+                        <option value="">-- Seleccione el Área --</option>
+                        <%
+                            if (listaInfra != null) {
+                                for (InventarioInfraestructura infra : listaInfra) {
+                                    // Filtramos para listar solo items que correspondan a áreas comunes y no departamentos sueltos
+                                    if ("ACTIVO".equals(infra.getEstado())) {
+                        %>
+                                    <option value="<%= infra.getId() %>"><%= infra.getNombreItem() %> - <%= infra.getTorre() != null ? infra.getTorre() : "General" %></option>
+                        <%
+                                    }
+                                }
+                            }
+                        %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha del Evento</label>
+                    <input type="date" name="fecha_reserva" required min="<%= java.time.LocalDate.now() %>">
+                </div>
+
+                <div class="form-group">
+                    <label>Turno Solicitado</label>
+                    <select name="turno" required>
+                        <option value="">-- Seleccione Turno --</option>
+                        <option value="MAÑANA">Mañana</option>
+                        <option value="TARDE">Tarde</option>
+                        <option value="NOCHE">Noche</option>
+                    </select>
+                </div>
             </div>
+
+            <div class="form-acciones">
+                <button type="submit" class="btn-guardar">Agendar Espacio</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-historial">
+        <h2>Control de Agendas y Reservas realizadas</h2>
+        <div class="tabla-responsive">
+            <table class="tabla-reservas">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Residente</th>
+                        <th>Área Común</th>
+                        <th>Fecha Evento</th>
+                        <th>Turno</th>
+                        <th>Registrado el</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        if (listaReservas != null && !listaReservas.isEmpty()) {
+                            for (Reserva r : listaReservas) {
+                    %>
+                            <tr>
+                                <td><%= r.getId() %></td>
+                                <td><strong><%= r.getNombreUsuario() != null ? r.getNombreUsuario() : "Desconocido" %></strong></td>
+                                <td><span class="badge-area"><%= r.getNombreAreaComun() != null ? r.getNombreAreaComun() : "No especificado" %></span></td>
+                                <td><%= r.getFechaReserva() != null ? r.getFechaReserva().format(formFecha) : "-" %></td>
+                                <td><span class="badge-turno <%= r.getTurno().toLowerCase() %>"><%= r.getTurno() %></span></td>
+                                <td><%= r.getFechaRegistro() != null ? r.getFechaRegistro().format(formRegistro) : "-" %></td>
+                                <td><span class="badge-estado <%= r.getEstado().toLowerCase() %>"><%= r.getEstado() %></span></td>
+                                <td>
+                                    <div class="acciones-flex">
+                                        <% if ("PROBADA".equals(r.getEstado())) { %>
+                                            <a href="${pageContext.request.contextPath}/reservas?accion=cancelar&id=<%= r.getId() %>"
+                                               class="btn-cancelar-reserva"
+                                               title="Cancelar Reserva"
+                                               onclick="return confirm('¿Seguro que deseas cancelar esta reserva por completo? Esto liberará el turno.');">❌ Cancelar</a>
+                                        <% } else { %>
+                                            <span class="texto-bloqueado">-</span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                    <%
+                            }
+                        } else {
+                    %>
+                        <tr>
+                            <td colspan="8" class="text-center">No existen solicitudes de separación de áreas registradas hoy.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

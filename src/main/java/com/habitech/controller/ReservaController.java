@@ -1,58 +1,63 @@
 package com.habitech.controller;
 
-import com.habitech.dao.ReservaDAO;
-import com.habitech.dao.impl.ReservaDAOImpl;
-import com.habitech.model.ReservaModel;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import com.habitech.dao.ReservaDao;
+import com.habitech.dao.impl.ReservaDaoImpl;
+import com.habitech.model.Reserva;
+
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @WebServlet("/reservas")
 public class ReservaController extends HttpServlet {
-    private final ReservaDAO reservaDAO = new ReservaDAOImpl();
+
+    private final ReservaDao reservaDao = new ReservaDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String accion = request.getParameter("accion");
+
+        if ("cancelar".equals(accion) && request.getParameter("id") != null) {
+            int idCancelar = Integer.parseInt(request.getParameter("id"));
+            reservaDao.cancelarReserva(idCancelar);
+        }
+
+        response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas");
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String action = request.getParameter("action");
+        request.setCharacterEncoding("UTF-8");
 
-        if ("reservar".equals(action)) {
-            try {
-                int inmuebleId = Integer.parseInt(request.getParameter("inmuebleId"));
-                String areaComun = request.getParameter("areaComun");
-                Date fechaReserva = Date.valueOf(request.getParameter("fechaReserva"));
-                String turno = request.getParameter("turno");
+        int usuarioId = Integer.parseInt(request.getParameter("usuario_id"));
+        int inventarioId = Integer.parseInt(request.getParameter("inventario_maestro_id"));
+        LocalDate fecha = LocalDate.parse(request.getParameter("fecha_reserva"));
+        String turno = request.getParameter("turno");
+        String estado = request.getParameter("estado");
 
-                // Validación de colisión de agenda
-                if (!reservaDAO.verificarDisponibilidad(areaComun, fechaReserva, turno)) {
-                    request.getSession().setAttribute("mensajeError", "❌ Conflicto de Agenda: El espacio seleccionado ya cuenta con una reserva activa en esa fecha y turno.");
-                } else {
-                    ReservaModel reserva = new ReservaModel(0, inmuebleId, areaComun, fechaReserva, turno, null);
-                    if (reservaDAO.registrarReserva(reserva)) {
-                        request.getSession().setAttribute("mensajeExito", "📅 ¡Reserva confirmada y agendada exitosamente!");
-                    } else {
-                        request.getSession().setAttribute("mensajeError", "❌ No se pudo registrar la reserva.");
-                    }
-                }
-            } catch (Exception e) {
-                request.getSession().setAttribute("mensajeError", "❌ Error al procesar los datos de la reserva.");
-            }
-        } else if ("cancelar".equals(action)) {
-            try {
-                int idReserva = Integer.parseInt(request.getParameter("idReserva"));
-                if (reservaDAO.eliminarReserva(idReserva)) {
-                    request.getSession().setAttribute("mensajeExito", "🗑️ Reserva cancelada. El espacio ha quedado liberado.");
-                } else {
-                    request.getSession().setAttribute("mensajeError", "❌ No se pudo cancelar la reserva.");
-                }
-            } catch (Exception e) {
-                request.getSession().setAttribute("mensajeError", "❌ Error al procesar la cancelación.");
-            }
+        // Validar duplicado antes de insertar
+        if (reservaDao.existeReserva(inventarioId, fecha, turno)) {
+            // Redireccionamos enviando una alerta de agenda ocupada
+            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas&error=duplicado");
+            return;
         }
 
-        response.sendRedirect(request.getContextPath() + "/dashboard?view=reservas");
+        Reserva r = new Reserva();
+        r.setUsuarioId(usuarioId);
+        r.setInventarioMaestroId(inventarioId);
+        r.setFechaReserva(fecha);
+        r.setTurno(turno);
+        r.setEstado(estado);
+
+        reservaDao.insertar(r);
+
+        response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas");
     }
 }

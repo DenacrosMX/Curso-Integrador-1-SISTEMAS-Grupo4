@@ -1,61 +1,230 @@
-body {
+/* ==========================================================================
+   VARIABLES GLOBALES Y RESET
+   ========================================================================== */
+:root {
+    --primary-color: #1e293b;   /* Azul pizarra oscuro para Header y Aside */
+    --secondary-color: #0f172a; /* Fondo ultra oscuro para selección */
+    --accent-color: #3b82f6;    /* Azul brillante para botones y enlaces activos */
+    --bg-light: #f8fafc;        /* Gris claro para el fondo del Main Content */
+    --text-main: #334155;       /* Color de texto principal */
+    --text-muted: #64748b;      /* Gris para textos secundarios o deshabilitados */
+    --white: #ffffff;
+    --border-color: #e2e8f0;
+    --success-color: #10b981;   /* Verde para estado ACTIVO */
+    --danger-color: #ef4444;    /* Rojo para estado INACTIVO */
+}
+
+* {
     margin: 0;
-    font-family: Arial;
-    background: #f4f6f9;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* HEADER */
-.header {
-    background: #007bff;
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
-
-/* LAYOUT */
-.layout {
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
 }
 
-/* SIDEBAR */
-.sidebar {
-    width: 220px;
-    height: calc(100vh - 120px);
-    background: #1f2d3d;
-    padding: 20px;
+/* ==========================================================================
+   1. HEADER (CABECERA SUPERIOR)
+   ========================================================================== */
+.dashboard-header {
+    background-color: var(--primary-color);
+    color: var(--white);
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.sidebar a {
-    display: block;
-    color: #cfd8dc;
+.header-logo h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #60a5fa;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.condominio-nombre {
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 4px;
+    border-left: 3px solid var(--accent-color);
+}
+
+.usuario-perfil {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.usuario-nombre {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.usuario-rol {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.btn-logout {
+    background-color: transparent;
+    color: #f1f5f9;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 12px;
+    font-size: 13px;
     text-decoration: none;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
 }
 
-.sidebar a:hover {
-    background: #007bff;
-    color: white;
+.btn-logout:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
 }
 
-/* CONTENT */
-.content {
+/* ==========================================================================
+   CONTENEDOR ESTRUCTURAL (LAYOUT COMPARTIDO)
+   ========================================================================== */
+.dashboard-container {
+    display: flex;
     flex: 1;
-    padding: 20px;
+    margin-top: 60px; /* Desplazamiento por el Header fijo */
+    min-height: calc(100vh - 100px); /* Resta Header + Footer */
 }
 
-/* CARD */
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
+/* ==========================================================================
+   2. ASIDE (BARRA LATERAL DE NAVEGACIÓN)
+   ========================================================================== */
+.dashboard-sidebar {
+    width: 260px;
+    background-color: var(--secondary-color);
+    position: fixed;
+    top: 60px;
+    bottom: 40px;
+    left: 0;
+    overflow-y: auto;
+    padding-top: 10px;
 }
 
-/* FOOTER */
-.footer {
-    background: #007bff;
-    color: white;
-    text-align: center;
-    padding: 10px;
+.sidebar-nav ul {
+    list-style: none;
+}
+
+.sidebar-nav li {
+    padding: 2px 10px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: #94a3b8;
+    text-decoration: none;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--white);
+    background-color: rgba(255,255,255,0.05);
+}
+
+/* Estado activo para el módulo donde se encuentra parado el usuario */
+.nav-link.active {
+    color: var(--white);
+    background-color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   3. MAIN CONTENT (ESCENARIO CENTRAL DINÁMICO)
+   ========================================================================== */
+.dashboard-content {
+    flex: 1;
+    margin-left: 260px; /* Desplazamiento por el Aside fijo */
+    padding: 30px;
+    background-color: var(--bg-light);
+}
+
+/* Componentes Genéricos de Ejemplo para visualizar el Main Content */
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.module-title {
+    font-size: 24px;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.card-mockup {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Badges de control de borrado lógico */
+.badge {
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+.badge-activo {
+    background-color: #d1fae5;
+    color: var(--success-color);
+}
+.badge-inactivo {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+}
+
+/* ==========================================================================
+   4. FOOTER (PIE DE PÁGINA)
+   ========================================================================== */
+.dashboard-footer {
+    background-color: var(--white);
+    color: var(--text-muted);
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    border-top: 1px solid var(--border-color);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
