@@ -1,112 +1,137 @@
-body {
+/* Paleta Corporativa Habitech - Variación de Fondo Claro con Contenedor Slate */
+:root {
+    --bg-general: #ffffff;        /* Fondo General Completamente Blanco */
+    --bg-tarjeta: #1e293b;        /* Slate 800 (Caja de Login Estándar) */
+    --bg-input: #334155;          /* Slate 700 (Fondo de las cajas de texto) */
+    --borde-input: #475569;       /* Slate 600 */
+    --texto-tarjeta: #f8fafc;     /* Slate 50 (Texto dentro de la caja oscura) */
+    --texto-mutado: #94a3b8;      /* Slate 400 (Subtítulos y placeholders) */
+    --accent-color: #3b82f6;      /* Azul Eléctrico para el Botón */
+    --accent-hover: #2563eb;      /* Azul hover */
+    --error-bg: #451a1a;          /* Fondo Alerta de Error */
+    --error-borde: #ef4444;       /* Borde Alerta */
+    --error-texto: #fca5a5;       /* Texto Alerta */
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Fondo principal limpio y blanco */
+body {
+    background-color: var(--bg-general);
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
 }
 
-.login-wrapper {
-    width: 100%;
-    max-width: 420px;
-    padding: 20px;
-}
-
+/* Caja de Login centralizada con el color estándar Slate */
 .login-container {
-    background: #ffffff;
-    padding: 40px 30px;
+    background-color: var(--bg-tarjeta);
+    width: 100%;
+    max-width: 440px;
+    padding: 3rem 2.5rem;
     border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .login-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 2.5rem; /* Mayor separación */
 }
 
 .login-header h1 {
-    color: #4f46e5;
-    margin: 0;
-    font-size: 32px;
-    font-weight: 800;
+    color: var(--texto-tarjeta);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
 }
 
 .login-header p {
-    color: #64748b;
-    font-size: 14px;
-    margin: 5px 0 0 0;
+    color: var(--texto-mutado);
+    font-size: 0.95rem;
 }
 
-.alert-error {
-    background-color: #fee2e2;
-    color: #991b1b;
-    padding: 12px;
+/* Alertas de error distribuidas de forma limpia */
+.alert-danger {
+    background-color: var(--error-bg);
+    border: 1px solid var(--error-borde);
+    color: var(--error-texto);
+    padding: 0.85rem 1rem;
     border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    text-align: center;
-    border: 1px solid #fca5a5;
-}
-
-.login-form {
+    font-size: 0.88rem;
+    margin-bottom: 2rem;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    gap: 0.6rem;
 }
 
+/* Distribución espaciada de las cajas de texto */
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    margin-bottom: 1.75rem; /* Espaciado uniforme entre campos */
 }
 
 .form-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
+    display: block;
+    margin-bottom: 0.6rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--texto-tarjeta);
 }
 
-.form-group input {
-    padding: 12px;
-    border: 1px solid #cbd5e1;
+.input-control {
+    width: 100%;
+    padding: 0.85rem 1rem; /* Más alto para mejor digitación */
+    background-color: var(--bg-input);
+    border: 1px solid var(--borde-input);
     border-radius: 6px;
-    font-size: 14px;
+    color: var(--texto-tarjeta);
+    font-size: 0.95rem;
     outline: none;
-    background-color: #f8fafc;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
 }
 
-.form-group input:focus {
-    border-color: #4f46e5;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+.input-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
-.btn-login {
-    background: #4f46e5;
-    color: white;
+.input-control::placeholder {
+    color: var(--texto-mutado);
+}
+
+/* Botón de acceso sólido */
+.btn-submit {
+    width: 100%;
+    padding: 0.85rem;
+    background-color: var(--accent-color);
+    color: #ffffff;
     border: none;
-    padding: 13px;
-    font-weight: 600;
-    font-size: 15px;
     border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
-    margin-top: 10px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    margin-top: 0.75rem;
 }
 
-.btn-login:hover {
-    background: #4338ca;
+.btn-submit:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-submit:active {
+    transform: scale(0.99);
 }
 
 .login-footer {
+    margin-top: 2.5rem;
     text-align: center;
-    margin-top: 30px;
-    font-size: 11px;
-    color: #94a3b8;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    color: var(--texto-mutado);
 }

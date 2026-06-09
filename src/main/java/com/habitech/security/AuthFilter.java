@@ -1,42 +1,35 @@
 package com.habitech.security;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import com.habitech.model.Usuario;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-// Este filtro interceptará todas las peticiones al dashboard y controladores protegidos
-@WebFilter(urlPatterns = {"/dashboard", "/visitas"})
-public class AuthFilter implements Filter {
+@WebFilter(urlPatterns = {"/dashboard", "/usuarios"})
+public class AuthFilter extends HttpFilter {
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // Inicialización opcional si se requiere
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        HttpSession session = httpRequest.getSession(false);
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+        HttpSession session = req.getSession(false);
 
-        // Comprobamos si el usuario tiene una sesión activa en el servidor
-        boolean estaLogueado = (session != null && session.getAttribute("usuarioSesion") != null);
+        // Intenta recuperar el objeto de usuario guardado en la sesión
+        Usuario usuarioLogueado = (session != null) ? (Usuario) session.getAttribute("usuarioLogueado") : null;
 
-        if (estaLogueado) {
-            // Si está autenticado, permitimos que continúe a la página solicitada
-            chain.doFilter(request, response);
+        if (usuarioLogueado == null) {
+            // Intrusión prevenida: Rebota al usuario intruso directo al login
+            res.sendRedirect(req.getContextPath() + "/login.jsp");
         } else {
-            // Si intenta burlar la URL sin loguearse, lo mandamos directo al Login con un mensaje
-            httpRequest.setAttribute("errorLogin", "🔒 Acceso denegado. Por favor, inicie sesión primero.");
-            httpRequest.getRequestDispatcher("/index.jsp").forward(httpRequest, httpResponse);
+            // Usuario verificado: Permite continuar la cadena de ejecución
+            chain.doFilter(request, response);
         }
-    }
-
-    @Override
-    public void destroy() {
-        // Limpieza de recursos si es necesario
     }
 }

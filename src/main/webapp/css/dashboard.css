@@ -228,3 +228,252 @@ body {
     right: 0;
     z-index: 1000;
 }
+
+/* ==========================================================================
+   5. COMPONENTES DEL HOME / VISTA POR DEFECTO (AÑADIDO ADAPTADO)
+   ========================================================================== */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.home-welcome h2 {
+    color: var(--primary-color);
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.home-welcome p {
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Rejilla de tarjetas KPI */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.kpi-card {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.kpi-category {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2563eb; /* Azul corporativo */
+}
+
+.kpi-value.value-red {
+    color: var(--danger-color);
+}
+
+.kpi-value.value-purple {
+    color: #7c3aed;
+}
+
+.kpi-status {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-green { color: var(--success-color); }
+.status-blue { color: #2563eb; }
+.status-orange { color: #d97706; }
+.status-gray { color: var(--text-muted); }
+
+/* Paneles informativos y de Actividad */
+.home-panels {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+@media (max-width: 992px) {
+    .home-panels {
+        grid-template-columns: 1fr;
+    }
+}
+
+.panel-main, .panel-side {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.panel-main h3, .panel-side h3 {
+    font-size: 16px;
+    color: var(--primary-color);
+    font-weight: 600;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 15px;
+}
+
+/* Listado de Comunicados */
+.comunicado-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.comunicado-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.comunicado-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.comunicado-titulo {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e40af;
+}
+
+.comunicado-fecha {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.comunicado-item p {
+    font-size: 13px;
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+/* Panel Lateral - Enlaces Directos */
+.panel-side {
+    display: flex;
+    flex-direction: column;
+}
+
+.shortcut-btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 11px 16px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.shortcut-btn:last-child {
+    margin-bottom: 0;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-secondary {
+    background-color: #f1f5f9;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+/* Estilos interactivos para el menú desplegable de descargas */
+.dropdown-content a:hover {
+    background-color: #f8fafc;
+    color: #0284c7 !important;
+}
+/* ==========================================================================
+   COMPONENTES DE EXPORTACIÓN EXCEL EN LA BARRA LATERAL (ASIDE TOOLS)
+   ========================================================================== */
+.sidebar-tools {
+    padding: 20px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: auto; /* Empuja de forma responsiva el bloque hacia la parte inferior del aside */
+}
+
+.btn-dropdown {
+    background-color: var(--accent-color) !important; /* Mantiene tu azul brillante de botones */
+    color: var(--white) !important;
+    border: none;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-dropdown:hover {
+    background-color: #2563eb !important; /* Tono azul hover reactivo */
+}
+
+.btn-dropdown:active {
+    transform: scale(0.98);
+}
+
+.dropdown-content {
+    display: none;
+    width: 100%;
+    margin-top: 6px;
+    border-radius: 4px;
+    background-color: #1e293b; /* Ajustado al tono pizarra oscuro del aside */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-content a {
+    color: #94a3b8 !important; /* Gris claro de alta legibilidad sobre fondo oscuro */
+    padding: 10px 14px !important;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    display: block;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--white) !important;
+}

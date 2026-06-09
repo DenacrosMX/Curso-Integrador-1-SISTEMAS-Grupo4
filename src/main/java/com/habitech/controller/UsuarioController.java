@@ -3,6 +3,7 @@ package com.habitech.controller;
 import com.habitech.dao.UsuarioDao;
 import com.habitech.dao.impl.UsuarioDaoImpl;
 import com.habitech.model.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,7 +20,6 @@ public class UsuarioController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Si por error entra un GET aquí para eliminar, lo procesamos y mandamos al dashboard
         String accion = request.getParameter("accion");
         if ("eliminar".equals(accion)) {
             int idEliminar = Integer.parseInt(request.getParameter("id"));
@@ -51,14 +51,17 @@ public class UsuarioController extends HttpServlet {
         usuario.setRol(rol);
 
         if (idStr == null || idStr.trim().isEmpty()) {
-            usuario.setPassword("123456"); // Password por defecto
+            // ENCRIPTAMOS LA CLAVE POR DEFECTO "123456" ANTES DE ENVIAR AL DAO
+            String passwordPlano = "123456";
+            String passwordHaseado = BCrypt.hashpw(passwordPlano, BCrypt.gensalt(12));
+
+            usuario.setPassword(passwordHaseado);
             usuarioDao.insertar(usuario);
         } else {
             usuario.setId(Integer.parseInt(idStr));
             usuarioDao.actualizar(usuario);
         }
 
-        // Al terminar de guardar o editar, redirigimos al dashboard con el parámetro del módulo
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=usuarios");
     }
 }

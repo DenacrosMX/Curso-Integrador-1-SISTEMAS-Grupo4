@@ -3,6 +3,7 @@ package com.habitech.dao.impl;
 import com.habitech.config.ConexionDB;
 import com.habitech.dao.UsuarioDao;
 import com.habitech.model.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ public class UsuarioDaoImpl implements UsuarioDao {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getUsername());
-            ps.setString(2, usuario.getPassword()); // Aquí llegará el hash de la contraseña
+            ps.setString(2, usuario.getPassword());
             ps.setString(3, usuario.getNombres());
             ps.setString(4, usuario.getApellidos());
             ps.setString(5, usuario.getEmail());
@@ -112,7 +113,6 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
     @Override
     public boolean eliminarLogico(int id) {
-        // En lugar de un DELETE físico, hacemos un UPDATE del estado a 'INACTIVO'
         String sql = "UPDATE usuarios SET estado = 'INACTIVO' WHERE id = ?";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -123,5 +123,39 @@ public class UsuarioDaoImpl implements UsuarioDao {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // METODO DE AUTENTICACION COMPLETO Y SEGURO PARA PRODUCCIÓN
+    @Override
+    public Usuario validarLogin(String username, String passwordPlano) {
+        String sql = "SELECT * FROM usuarios WHERE username = ? AND estado = 'ACTIVO'";
+
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String hashGuardado = rs.getString("password");
+
+                    // Compara directamente usando la librería BCrypt de forma limpia
+                    if (BCrypt.checkpw(passwordPlano, hashGuardado)) {
+                        Usuario u = new Usuario();
+                        u.setId(rs.getInt("id"));
+                        u.setUsername(rs.getString("username"));
+                        u.setNombres(rs.getString("nombres"));
+                        u.setApellidos(rs.getString("apellidos"));
+                        u.setEmail(rs.getString("email"));
+                        u.setTelefono(rs.getString("telefono"));
+                        u.setRol(rs.getString("rol"));
+                        u.setEstado(rs.getString("estado"));
+                        return u;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

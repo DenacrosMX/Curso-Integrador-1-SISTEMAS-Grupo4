@@ -1,50 +1,55 @@
 package com.habitech.controller;
 
-import com.habitech.dao.UsuarioDAO;
-import com.habitech.dao.impl.UsuarioDAOImpl;
-import com.habitech.model.UsuarioModel;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import com.habitech.dao.UsuarioDao;
+import com.habitech.dao.impl.UsuarioDaoImpl;
+import com.habitech.model.Usuario;
+
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/auth")
 public class LoginController extends HttpServlet {
-    private final UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
 
-    // GET maneja el Logout (Cerrar Sesión)
+    private final UsuarioDao usuarioDao = new UsuarioDaoImpl();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate(); // Destruye la sesión del usuario
-        }
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        // Bloqueo de accesos manuales directos por URL a /auth, redirige al login
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
 
-    // POST maneja el Login (Iniciar Sesión)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        request.setCharacterEncoding("UTF-8");
 
-        // Autentica usando BCrypt internamente en el DAO
-        UsuarioModel usuarioLogueado = usuarioDAO.autenticar(username, password);
+        String userParam = request.getParameter("txtUser");
+        String passParam = request.getParameter("txtPass");
 
-        if (usuarioLogueado != null) {
-            // Guardamos el objeto usuario en la sesión web
-            HttpSession session = request.getSession();
-            session.setAttribute("usuarioSesion", usuarioLogueado);
+        Usuario usuarioAutenticado = usuarioDao.validarLogin(userParam, passParam);
 
-            // Redirecciona al Dashboard principal
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+        if (usuarioAutenticado != null) {
+            HttpSession session = request.getSession(true);
+            session.setAttribute("usuarioLogueado", usuarioAutenticado);
+
+            // SI LA CONTRASEÑA INTRODUCIDA ES LA DE DEFECTO, FORZAMOS EL RESETEO
+            if ("123456".equals(passParam)) {
+                System.out.println("[Login] -> Usuario con clave inicial. Redirigiendo a reset de contraseña.");
+                response.sendRedirect(request.getContextPath() + "/cambiar-password.jsp");
+            } else {
+                System.out.println("[Login] -> Usuario seguro. Redirigiendo al Dashboard...");
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            }
         } else {
-            // Si las credenciales fallan, devuelve un mensaje explicativo
-            request.setAttribute("errorLogin", "❌ Credenciales incorrectas o usuario inactivo.");
-            request.getRequestDispatcher("/index.jsp").forward(request, response);
+            request.setAttribute("errorLogin", "El usuario o la contraseña ingresada son incorrectos.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 }

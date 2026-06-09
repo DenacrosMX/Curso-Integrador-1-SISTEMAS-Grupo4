@@ -2,7 +2,6 @@ package com.habitech.model;
 
 public class Usuario {
 
-    // Atributos privados (Encapsulamiento)
     private Integer id;
     private String username;
     private String password;
@@ -13,11 +12,9 @@ public class Usuario {
     private String rol;
     private String estado;
 
-    // Constructor vacío (Obligatorio para buenas prácticas y mapeos)
     public Usuario() {
     }
 
-    // Constructor completo (Útil para crear instancias rápidamente)
     public Usuario(Integer id, String username, String password, String nombres, String apellidos, String email, String telefono, String rol, String estado) {
         this.id = id;
         this.username = username;
@@ -30,7 +27,6 @@ public class Usuario {
         this.estado = estado;
     }
 
-    // Métodos Getters y Setters
     public Integer getId() {
         return id;
     }
