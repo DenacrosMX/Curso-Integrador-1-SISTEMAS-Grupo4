@@ -39,8 +39,9 @@ public class ReservaDaoImpl implements ReservaDao {
     public List<Reserva> listarTodas() {
         List<Reserva> lista = new ArrayList<>();
         // Query avanzada que cruza tablas para armar la grilla visual informativa
+        // CORRECCIÓN EXACTA: Se cambia i.nombre_item por i.tipo_elemento basado en el DDL real
         String sql = "SELECT r.id, r.usuario_id, r.inventario_maestro_id, r.fecha_reserva, r.turno, r.estado, r.fecha_registro, "
-                + "       (u.nombres || ' ' || u.apellidos) AS nombre_completo, i.nombre_item AS area_comun "
+                + "       (u.nombres || ' ' || u.apellidos) AS nombre_completo, i.tipo_elemento AS area_comun "
                 + "FROM reservas r "
                 + "LEFT JOIN usuarios u ON r.usuario_id = u.id "
                 + "LEFT JOIN inventario_maestro_infraestructura i ON r.inventario_maestro_id = i.id "

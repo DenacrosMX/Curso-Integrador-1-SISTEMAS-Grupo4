@@ -43,7 +43,8 @@
                     <li><a href="${pageContext.request.contextPath}/dashboard?modulo=asignaciones" class="nav-link">Asignaciones</a></li>
                     <li><a href="#" class="nav-link">Recibos</a></li>
                     <li><a href="#" class="nav-link">Visitas</a></li>
-                    <li><a href="#" class="nav-link">Incidencias</a></li>
+                    <%-- ENLACE INTEGRADO: Módulo de Incidencias --%>
+                    <li><a href="${pageContext.request.contextPath}/dashboard?modulo=incidencias" class="nav-link">Incidencias</a></li>
                     <%-- ENLACE INTEGRADO: Módulo de Reservas --%>
                     <li><a href="${pageContext.request.contextPath}/dashboard?modulo=reservas" class="nav-link">Reservas</a></li>
                     <%-- ENLACE INTEGRADO: Módulo de Comunicados --%>
@@ -72,6 +73,11 @@
                 <%-- Renderizado dinámico del módulo de Asignaciones (Contratos/Ocupación) --%>
                 <c:when test="${moduloActivo == 'asignaciones'}">
                     <jsp:include page="asignaciones.jsp" />
+                </c:when>
+
+                <%-- INTEGRACIÓN: Renderizado del módulo de Incidencias --%>
+                <c:when test="${moduloActivo == 'incidencias'}">
+                    <jsp:include page="incidencias.jsp" />
                 </c:when>
 
                 <%-- INTEGRACIÓN: Renderizado del módulo de Reservas --%>

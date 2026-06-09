@@ -1,0 +1,223 @@
+/* ==========================================================================
+   MÓDULO DE INCIDENCIAS - INTEGRACIÓN ARQUITECTURA VISUAL HABITECH
+   ========================================================================== */
+
+/* Contenedor Base unificado */
+.modulo-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #e2e8f0;
+}
+
+/* Banner de Alertas */
+.alerta-error {
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #f87171;
+    padding: 14px 20px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+/* Estructura Base de Tarjetas (Formulario e Historial de Incidencias) */
+.card-formulario, .card-historial {
+    background-color: #1e293b;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.card-formulario h2, .card-historial h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #38bdf8;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 10px;
+}
+
+/* Formulario Grid y Elementos de Entrada */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #f8fafc;
+    font-size: 0.95rem;
+    outline: none;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #38bdf8;
+}
+
+/* Acciones y Botones */
+.form-acciones {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn-guardar {
+    background-color: #38bdf8;
+    color: #0f172a;
+    font-weight: 600;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+.btn-guardar:hover {
+    background-color: #0ea5e9;
+}
+
+/* Adaptación de la Tabla de Incidencias al estándar */
+.tabla-responsive {
+    overflow-x: auto;
+}
+
+.tabla-incidencias {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.tabla-incidencias th {
+    background-color: #0f172a;
+    color: #94a3b8;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 2px solid #334155;
+}
+
+.tabla-incidencias td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #334155;
+    color: #cbd5e1;
+}
+
+.tabla-incidencias tbody tr:hover {
+    background-color: #24334d;
+}
+
+/* Detalle interno de la Incidencia */
+.detalle-incidencia strong {
+    color: #f8fafc;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.detalle-incidencia p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+/* Badges de Prioridad (Reutilizan la estructura de Turnos) */
+.badge-prioridad {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+.badge-prioridad.baja { background-color: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.badge-prioridad.media { background-color: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.badge-prioridad.alta { background-color: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+/* Badges de Estado (Estructura estándar de reservas) */
+.badge-estado {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+.badge-estado.abierto { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.badge-estado.en_proceso { background-color: rgba(249, 115, 22, 0.2); color: #fb923c; }
+.badge-estado.resuelto { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.badge-estado.anulado { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+/* Botones de Control de la Tabla (Estilo btn-cancelar-reserva) */
+.acciones-flex {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-accion {
+    background-color: transparent;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-weight: 500;
+}
+
+.btn-accion.btn-atender {
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+}
+.btn-accion.btn-atender:hover { background-color: rgba(56, 189, 248, 0.15); }
+
+.btn-accion.btn-resolver {
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+.btn-accion.btn-resolver:hover { background-color: rgba(34, 197, 94, 0.15); }
+
+.btn-accion.btn-anular {
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+.btn-accion.btn-anular:hover { background-color: rgba(239, 68, 68, 0.15); }
+
+.texto-bloqueado {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.text-center {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+}

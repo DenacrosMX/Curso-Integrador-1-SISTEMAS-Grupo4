@@ -30,7 +30,7 @@
         <h2>Registrar Nueva Reserva de Área Común</h2>
 
         <form action="${pageContext.request.contextPath}/reservas" method="POST">
-            <input type="hidden" name="estado" value="PROBADA">
+            <input type="hidden" name="estado" value="APROBADA">
 
             <div class="form-grid">
                 <div class="form-group">
@@ -59,7 +59,7 @@
                                     // Filtramos para listar solo items que correspondan a áreas comunes y no departamentos sueltos
                                     if ("ACTIVO".equals(infra.getEstado())) {
                         %>
-                                    <option value="<%= infra.getId() %>"><%= infra.getNombreItem() %> - <%= infra.getTorre() != null ? infra.getTorre() : "General" %></option>
+                                        <option value="<%= infra.getId() %>"><%= infra.getTipoElemento() %> - <%= infra.getTorre() != null ? infra.getTorre() : "General" %></option>
                         <%
                                     }
                                 }
@@ -121,7 +121,13 @@
                                 <td><span class="badge-estado <%= r.getEstado().toLowerCase() %>"><%= r.getEstado() %></span></td>
                                 <td>
                                     <div class="acciones-flex">
-                                        <% if ("PROBADA".equals(r.getEstado())) { %>
+                                        <%
+                                            // Normalizamos el texto quitando espacios fijos de la base de datos
+                                            String est = (r.getEstado() != null) ? r.getEstado().trim().toUpperCase() : "";
+
+                                            // Lógica exclusiva para APROBADA
+                                            if ("APROBADA".equals(est)) {
+                                        %>
                                             <a href="${pageContext.request.contextPath}/reservas?accion=cancelar&id=<%= r.getId() %>"
                                                class="btn-cancelar-reserva"
                                                title="Cancelar Reserva"

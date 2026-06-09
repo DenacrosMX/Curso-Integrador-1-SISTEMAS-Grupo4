@@ -1,10 +1,12 @@
 package com.habitech.dao;
 
-import com.habitech.model.IncidenciaModel;
+import com.habitech.model.Incidencia;
 import java.util.List;
 
-public interface IncidenciaDAO {
-    List<IncidenciaModel> listarIncidencias();
-    boolean registrarIncidencia(IncidenciaModel incidencia);
-    boolean actualizarEstado(int idIncidencia, String nuevoEstado);
+public interface IncidenciaDao {
+    boolean insertar(Incidencia incidencia);
+    List<Incidencia> listarTodas();
+    Incidencia obtenerPorId(int id);
+    boolean actualizarEstado(int id, String nuevoEstado, Integer conserjeId);
+    boolean asignarConserje(int id, int conserjeId);
 }

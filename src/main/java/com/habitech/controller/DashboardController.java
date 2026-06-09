@@ -12,6 +12,8 @@ import com.habitech.dao.ComunicadoDao;
 import com.habitech.dao.impl.ComunicadoDaoImpl;
 import com.habitech.dao.ReservaDao;
 import com.habitech.dao.impl.ReservaDaoImpl;
+import com.habitech.dao.IncidenciaDao;
+import com.habitech.dao.impl.IncidenciaDaoImpl; // Inyección del DAO de Incidencias
 
 import com.habitech.model.Usuario;
 import com.habitech.model.Configuracion;
@@ -19,6 +21,7 @@ import com.habitech.model.InventarioInfraestructura;
 import com.habitech.model.Asignacion;
 import com.habitech.model.Comunicado;
 import com.habitech.model.Reserva;
+import com.habitech.model.Incidencia; // Import del modelo
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -40,7 +43,8 @@ public class DashboardController extends HttpServlet {
     private final InventarioInfraestructuraDao infraestructuraDao = new InventarioInfraestructuraDaoImpl();
     private final AsignacionDao asignacionDao = new AsignacionDaoImpl();
     private final ComunicadoDao comunicadoDao = new ComunicadoDaoImpl();
-    private final ReservaDao reservaDao = new ReservaDaoImpl(); // Inyección del nuevo DAO de reservas
+    private final ReservaDao reservaDao = new ReservaDaoImpl();
+    private final IncidenciaDao incidenciaDao = new IncidenciaDaoImpl(); // Instancia del DAO de Incidencias
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -143,22 +147,31 @@ public class DashboardController extends HttpServlet {
                 request.setAttribute("moduloActivo", "reservas");
                 request.setAttribute("cssModulo", "reservas.css");
 
-                // 1. Historial completo de reservas con JOINS mapeados
                 List<Reserva> listaReservas = reservaDao.listarTodas();
                 request.setAttribute("reservas", listaReservas);
 
-                // 2. Residentes/Usuarios disponibles para asociar al combo select
                 List<Usuario> listaUsuarios = usuarioDao.listarTodos();
                 request.setAttribute("usuarios", listaUsuarios);
 
-                // 3. Infraestructura disponible (Parrillas, Salones, Canchas, etc.)
                 List<InventarioInfraestructura> listaInfra = infraestructuraDao.listarTodo();
                 request.setAttribute("inventario", listaInfra);
 
-                // Capturar alerta de error por agenda duplicada si existe
                 if ("duplicado".equals(request.getParameter("error"))) {
                     request.setAttribute("alertaError", "El área seleccionada ya se encuentra reservada en esa fecha y turno.");
                 }
+
+                // MÓDULO 7: CONTROL DE INCIDENCIAS (NUEVO)
+            } else if ("incidencias".equals(modulo)) {
+                request.setAttribute("moduloActivo", "incidencias");
+                request.setAttribute("cssModulo", "incidencias.css");
+
+                // 1. Carga de historial completo de incidencias
+                List<Incidencia> listaIncidencias = incidenciaDao.listarTodas();
+                request.setAttribute("incidencias", listaIncidencias);
+
+                // 2. Carga de asignaciones vigentes para vincular la incidencia a un departamento/vivienda
+                List<Asignacion> listaAsignaciones = asignacionDao.listarTodas();
+                request.setAttribute("asignaciones", listaAsignaciones);
 
                 // VISTA POR DEFECTO
             } else {
