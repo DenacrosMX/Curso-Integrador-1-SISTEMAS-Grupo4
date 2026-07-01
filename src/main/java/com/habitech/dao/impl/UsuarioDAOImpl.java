@@ -138,8 +138,16 @@ public class UsuarioDaoImpl implements UsuarioDao {
                 if (rs.next()) {
                     String hashGuardado = rs.getString("password");
 
+                    // Verificar que el hash almacenado sea un hash BCrypt válido
+                    if (hashGuardado == null || !hashGuardado.startsWith("$2")) {
+                        System.out.println("[Login] ERROR -> La contraseña del usuario '" + username
+                                + "' no es un hash BCrypt válido. Fue insertada en texto plano.");
+                        return null;
+                    }
+
                     // Compara directamente usando la librería BCrypt de forma limpia
                     if (BCrypt.checkpw(passwordPlano, hashGuardado)) {
+
                         Usuario u = new Usuario();
                         u.setId(rs.getInt("id"));
                         u.setUsername(rs.getString("username"));
@@ -150,10 +158,15 @@ public class UsuarioDaoImpl implements UsuarioDao {
                         u.setRol(rs.getString("rol"));
                         u.setEstado(rs.getString("estado"));
                         return u;
+                    } else {
+                        System.out.println("[Login] -> Contraseña incorrecta para usuario: " + username);
                     }
+                } else {
+                    System.out.println("[Login] -> Usuario no encontrado o INACTIVO: " + username);
                 }
             }
         } catch (SQLException e) {
+            System.out.println("[Login] ERROR SQL -> " + e.getMessage());
             e.printStackTrace();
         }
         return null;

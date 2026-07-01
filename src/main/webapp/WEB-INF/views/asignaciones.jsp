@@ -24,7 +24,6 @@
                     <select name="usuarioId" id="usuarioId" required class="form-control">
                         <option value="">-- Seleccione Habitante --</option>
                         <c:forEach var="usr" items="${usuarios}">
-                            <%-- CORRECCIÓN: Se cambió usr.nombre por usr.nombres --%>
                             <option value="${usr.id}" <c:if test="${asignacionSeleccionada.usuarioId == usr.id}">selected</c:if>>
                                 ${usr.nombres} (${usr.rol})
                             </option>
@@ -35,7 +34,7 @@
                 <%-- Selector de Infraestructura Base --%>
                 <div class="form-group col-4">
                     <label for="inventarioMaestroId">Estructura Base</label>
-                    <select name="inventarioMaestroId" id="inventarioMaestroId" required class="form-control">
+                    <select name="inventarioMaestroId" id="inventarioMaestroId" required class="form-control" onchange="cargarUnidadesEspecificas(this.value)">
                         <option value="">-- Seleccione Bloque --</option>
                         <c:forEach var="inf" items="${inventario}">
                             <option value="${inf.id}" <c:if test="${asignacionSeleccionada.inventarioMaestroId == inf.id}">selected</c:if>>
@@ -51,11 +50,17 @@
                     </select>
                 </div>
 
-                <%-- Código Específico de Unidad --%>
+                <%-- Código Específico de Unidad (MODIFICADO A ID) --%>
                 <div class="form-group col-4">
                     <label for="codigoUnidadSpecificas">Código de Unidad Específica</label>
-                    <input type="text" name="codigoUnidadEspecifica" id="codigoUnidadSpecificas" placeholder="Ej: DPTO-101, COCHERA-05"
-                           value="${asignacionSeleccionada.codigoUnidadEspecifica}" required class="form-control">
+                    <select name="unidadEspecificaId" id="codigoUnidadSpecificas" required class="form-control">
+                        <option value="">-- Seleccione Código --</option>
+                        <c:if test="${not empty asignacionSeleccionada}">
+                            <option value="${asignacionSeleccionada.unidadEspecificaId}" selected>
+                                ${asignacionSeleccionada.codigoUnidadEspecifica}
+                            </option>
+                        </c:if>
+                    </select>
                 </div>
             </div>
 
@@ -138,11 +143,9 @@
                                 <td>
                                     <div class="acciones-iconos">
                                         <c:if var="esActivo" test="${asig.estado == 'ACTIVO'}">
-                                            <%-- Editar Contrato Activo --%>
                                             <a href="${pageContext.request.contextPath}/dashboard?modulo=asignaciones&accion=editar&id=${asig.id}" class="icon-edit" title="Modificar Datos">
                                                 ✏️
                                             </a>
-                                            <%-- Finalizar Contrato (Baja contractual) --%>
                                             <a href="${pageContext.request.contextPath}/asignaciones?accion=finalizar&id=${asig.id}"
                                                class="icon-delete" title="Finalizar Contrato / Desocupar"
                                                onclick="return confirm('¿Está seguro de finalizar este contrato de asignación? Se registrará la fecha de salida de hoy de forma automática.');">
@@ -159,7 +162,7 @@
                     </c:when>
                     <c:otherwise>
                         <tr>
-                            <td colspan="10" class="tabla-vacia">No existen asignaciones de unidades registradas en el sistema.</td>
+                            <td colspan="10" class="tabla-vacia">No existen asignaciones de unidades registradas in el sistema.</td>
                         </tr>
                     </c:otherwise>
                 </c:choose>
@@ -168,3 +171,42 @@
     </div>
 
 </div>
+
+<%-- SCRIPT AJAX ASÍNCRONO PARA LA INTERACTIVIDAD --%>
+<script>
+function cargarUnidadesEspecificas(infraestructuraId) {
+    const selectUnidad = document.getElementById("codigoUnidadSpecificas");
+
+    selectUnidad.innerHTML = '<option value="">-- Seleccione Código --</option>';
+
+    if (!infraestructuraId) return;
+
+    const url = `${pageContext.request.contextPath}/api/unidades-disponibles?infraestructuraId=${infraestructuraId}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error("Error en la respuesta de red");
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.length > 0) {
+                data.forEach(unidad => {
+                    const option = document.createElement("option");
+                    option.value = unidad.id; // Modificado: Envía el ID numérico
+                    option.textContent = unidad.codigoUnidad; // Muestra la etiqueta de texto legible
+                    selectUnidad.appendChild(option);
+                });
+            } else {
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = "⚠️ No hay unidades disponibles";
+                option.disabled = true;
+                selectUnidad.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error("Error cargando unidades específicas:", error);
+            selectUnidad.innerHTML = '<option value="">⚠️ Error al cargar elementos</option>';
+        });
+}
+</script>

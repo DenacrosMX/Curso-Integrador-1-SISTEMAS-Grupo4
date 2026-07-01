@@ -7,21 +7,21 @@ public class Asignacion {
     private int id;
     private int usuarioId;
     private int inventarioMaestroId;
-    private String codigoUnidadEspecifica;
-    private String tipoAdquisicion; // 'PROPIETARIO', 'INQUILINO', 'RESERVA'
+    private int unidadEspecificaId; // NUEVO: Para guardar el ID numérico en la BD
+    private String codigoUnidadEspecifica; // Se mantiene para la UI y listados
+    private String tipoAdquisicion;
     private BigDecimal precioMensualPactado;
-    private String estado; // 'ACTIVO', 'FINALIZADO'
+    private String estado;
     private Date fechaIngreso;
     private Date fechaSalida;
 
     // Campos de apoyo para la UI (Joins)
-    private String nombreUsuario;         // Nombre del Propietario/Inquilino
-    private String detalleInfraestructura; // Ej: "TORRE A - PISO 2 (DEPARTAMENTO)"
+    private String nombreUsuario;
+    private String detalleInfraestructura;
 
     public Asignacion() {
     }
 
-    // Getters y Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -30,6 +30,9 @@ public class Asignacion {
 
     public int getInventarioMaestroId() { return inventarioMaestroId; }
     public void setInventarioMaestroId(int inventarioMaestroId) { this.inventarioMaestroId = inventarioMaestroId; }
+
+    public int getUnidadEspecificaId() { return unidadEspecificaId; }
+    public void setUnidadEspecificaId(int unidadEspecificaId) { this.unidadEspecificaId = unidadEspecificaId; }
 
     public String getCodigoUnidadEspecifica() { return codigoUnidadEspecifica; }
     public void setCodigoUnidadEspecifica(String codigoUnidadEspecifica) { this.codigoUnidadEspecifica = codigoUnidadEspecifica; }

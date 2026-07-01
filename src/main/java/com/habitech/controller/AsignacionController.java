@@ -44,7 +44,6 @@ public class AsignacionController extends HttpServlet {
             logger.error("Error al parsear el ID de asignación para la baja contractual", e);
         }
 
-        // Redirección de control al dashboard apuntando al módulo de asignaciones
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=asignaciones");
     }
 
@@ -57,7 +56,10 @@ public class AsignacionController extends HttpServlet {
         String idParam = request.getParameter("id");
         String usuarioIdParam = request.getParameter("usuarioId");
         String inventarioMaestroIdParam = request.getParameter("inventarioMaestroId");
-        String codigoUnidadEspecifica = request.getParameter("codigoUnidadEspecifica");
+
+        // El select de tu HTML debe enviar el ID numérico de la unidad específica elegida
+        String unidadEspecificaIdParam = request.getParameter("codigoUnidadEspecifica");
+
         String tipoAdquisicion = request.getParameter("tipoAdquisicion");
         String precioParam = request.getParameter("precioMensualPactado");
         String estado = request.getParameter("estado");
@@ -68,10 +70,14 @@ public class AsignacionController extends HttpServlet {
             Asignacion asignacion = new Asignacion();
             asignacion.setUsuarioId(Integer.parseInt(usuarioIdParam));
             asignacion.setInventarioMaestroId(Integer.parseInt(inventarioMaestroIdParam));
-            asignacion.setCodigoUnidadEspecifica(codigoUnidadEspecifica);
+
+            // Conversión segura del ID numérico enviado por el Dropdown dinámico
+            if (unidadEspecificaIdParam != null && !unidadEspecificaIdParam.trim().isEmpty()) {
+                asignacion.setUnidadEspecificaId(Integer.parseInt(unidadEspecificaIdParam.trim()));
+            }
+
             asignacion.setTipoAdquisicion(tipoAdquisicion);
 
-            // Conversión segura a BigDecimal para el precio pactado
             BigDecimal precio = (precioParam != null && !precioParam.trim().isEmpty())
                     ? new BigDecimal(precioParam.trim())
                     : BigDecimal.ZERO;
@@ -79,7 +85,6 @@ public class AsignacionController extends HttpServlet {
 
             asignacion.setEstado(estado != null ? estado : "ACTIVO");
 
-            // Mapeo seguro de fechas SQL DATE
             if (fechaIngresoParam != null && !fechaIngresoParam.trim().isEmpty()) {
                 asignacion.setFechaIngreso(Date.valueOf(fechaIngresoParam));
             } else {
@@ -91,12 +96,10 @@ public class AsignacionController extends HttpServlet {
             }
 
             if (idParam == null || idParam.trim().isEmpty()) {
-                // OPERACIÓN: NUEVO REGISTRO
-                logger.info("Intentando registrar nueva asignación para la unidad {} de tipo {}.",
-                        codigoUnidadEspecifica, tipoAdquisicion);
+                logger.info("Intentando registrar nueva asignación para la unidad ID {} de tipo {}.",
+                        asignacion.getUnidadEspecificaId(), tipoAdquisicion);
                 asignacionDao.insertar(asignacion);
             } else {
-                // OPERACIÓN: EDICIÓN / ACTUALIZACIÓN
                 asignacion.setId(Integer.parseInt(idParam));
                 logger.info("Intentando actualizar asignación existente con ID: {}", asignacion.getId());
                 asignacionDao.actualizar(asignacion);
@@ -106,7 +109,6 @@ public class AsignacionController extends HttpServlet {
             logger.error("Error crítico al procesar la asignación contractual en doPost", e);
         }
 
-        // Redirección limpia para refrescar la grilla del dashboard
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=asignaciones");
     }
 }

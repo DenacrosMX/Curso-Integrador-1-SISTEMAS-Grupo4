@@ -13,12 +13,13 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
 @WebServlet(name = "BoletaController", urlPatterns = {"/boletas"})
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10) // Soporte nativo de subida de vouchers
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10)
 public class BoletaController extends HttpServlet {
 
     private final ReciboDao reciboDao = new ReciboDaoImpl();
@@ -34,31 +35,56 @@ public class BoletaController extends HttpServlet {
                 int id = Integer.parseInt(request.getParameter("id"));
                 Recibo recibo = reciboDao.obtenerPorId(id);
 
-                // Jalar datos simulación de configuración global
-                Configuracion conf = new Configuracion();
-                conf.setNombreCondominio("Torres del Sol");
-                conf.setRuc("20123456789");
-                conf.setDireccion("Av. Principal 123, Lima");
+                if (recibo != null) {
+                    response.setContentType("application/pdf");
+                    response.setHeader("Content-Disposition", "inline; filename=Boleta_" + recibo.getNroComprobante() + ".pdf");
 
-                response.setContentType("application/pdf");
-                response.setHeader("Content-Disposition", "attachment; filename=Boleta_" + recibo.getNroComprobante() + ".pdf");
-
-                GeneradorPdfBoleta.generarBoleta(recibo, conf, response.getOutputStream());
-                return;
+                    Configuracion conf = obtenerConfiguracionEmpresa();
+                    GeneradorPdfBoleta.generarBoleta(recibo, conf, response.getOutputStream());
+                    return;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas&error=pdf");
-                return;
             }
-        }
+            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
 
-        if ("validar".equals(accion)) {
+        } else if ("validar".equals(accion)) {
             int id = Integer.parseInt(request.getParameter("id"));
-            HttpSession session = request.getSession();
-            Usuario admin = (Usuario) session.getAttribute("usuarioLogueado");
-            int adminId = (admin != null) ? admin.getId() : 1; // Respaldo por si navegas en local sin login estricto
+            Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("usuarioLogueado");
+            int adminId = (usuarioLogueado != null) ? usuarioLogueado.getId() : 1;
 
-            reciboDao.cambiarEstadoPago(id, "PAGADO", adminId);
+            // 1. Cambiamos el estado a PAGADO en la Base de Datos
+            boolean actualizado = reciboDao.cambiarEstadoPago(id, "PAGADO", adminId);
+
+            if (actualizado) {
+                try {
+                    // 2. Al validar el pago, obtenemos los datos completos del recibo e inmediatamente generamos el PDF físico
+                    Recibo recibo = reciboDao.obtenerPorId(id);
+                    if (recibo != null) {
+                        String uploadPath = obtenerRutaAlmacenamiento();
+
+                        // Creamos un nombre estandarizado para el archivo de la boleta del residente
+                        String nombrePdf = "boleta_" + recibo.getId() + "_" + recibo.getNroComprobante().replace("#", "").replace("-", "_") + ".pdf";
+                        File pdfFile = new File(uploadPath + File.separator + nombrePdf);
+
+                        // Escribimos el PDF en el almacenamiento del servidor
+                        try (FileOutputStream fos = new FileOutputStream(pdfFile)) {
+                            Configuracion conf = obtenerConfiguracionEmpresa();
+                            GeneradorPdfBoleta.generarBoleta(recibo, conf, fos);
+                        }
+
+                        request.getSession().setAttribute("alertaSuccess", "El pago ha sido aprobado y la boleta PDF fue generada con éxito.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    request.getSession().setAttribute("alertaSuccess", "El pago se aprobó, pero hubo un percance al compilar el PDF físico.");
+                }
+            } else {
+                request.getSession().setAttribute("alertaError", "No se pudo actualizar el estado de la boleta.");
+            }
+
+            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
+        } else {
             response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
         }
     }
@@ -67,62 +93,116 @@ public class BoletaController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
         String accion = request.getParameter("accion");
-        HttpSession session = request.getSession();
-        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
-        int responsableId = (usuarioLogueado != null) ? usuarioLogueado.getId() : 1;
+        Usuario usuarioLogueado = (Usuario) request.getSession().getAttribute("usuarioLogueado");
 
         if ("emitir".equals(accion)) {
-            // Flujo del Admin: Crear el cobro base
-            int residenteId = Integer.parseInt(request.getParameter("usuario_id"));
+            int usuarioId = Integer.parseInt(request.getParameter("usuario_id"));
             int mes = Integer.parseInt(request.getParameter("mes"));
             int anio = Integer.parseInt(request.getParameter("anio"));
-            BigDecimal montoMantenimiento = new BigDecimal(request.getParameter("monto_base"));
+            BigDecimal montoBase = new BigDecimal(request.getParameter("monto_base"));
 
-            Recibo r = new Recibo();
-            r.setUsuarioId(residenteId);
-            r.setUsuarioResponsableId(responsableId);
-            r.setMesFacturado(mes);
-            r.setAnioFacturado(anio);
-            r.setTotalAPagar(montoMantenimiento);
-
-            // Primer concepto obligatorio del detalle
-            r.getDetalles().add(new DetalleRecibo("Cuota Mensual de Mantenimiento Estándar", montoMantenimiento));
-
-            // Concepto opcional si el admin añade un extra (Áreas comunes / Multas)
             String extraDesc = request.getParameter("concepto_extra");
             String extraMontoStr = request.getParameter("monto_extra");
-            if (extraDesc != null && !extraDesc.trim().isEmpty() && extraMontoStr != null) {
+
+            Recibo r = new Recibo();
+            r.setUsuarioId(usuarioId);
+            r.setUsuarioResponsableId(usuarioLogueado != null ? usuarioLogueado.getId() : 1);
+            r.setMesFacturado(mes);
+            r.setAnioFacturado(anio);
+            r.setTotalAPagar(montoBase);
+            r.setFechaEmision(new java.sql.Date(System.currentTimeMillis()));
+            r.setEstadoPago("PENDIENTE");
+
+            r.getDetalles().add(new DetalleRecibo("Mantenimiento Mensual Estándar Base", montoBase));
+
+            if (extraMontoStr != null && !extraMontoStr.trim().isEmpty()) {
                 BigDecimal montoExtra = new BigDecimal(extraMontoStr);
                 if (montoExtra.compareTo(BigDecimal.ZERO) > 0) {
+                    if (extraDesc == null || extraDesc.trim().isEmpty()) {
+                        extraDesc = "Concepto Adicional / Penalidad de Convivencia";
+                    }
                     r.getDetalles().add(new DetalleRecibo(extraDesc.trim(), montoExtra));
-                    r.setTotalAPagar(r.getTotalAPagar().add(montoExtra)); // Sumar al gran total del maestro
+                    r.setTotalAPagar(r.getTotalAPagar().add(montoExtra));
                 }
             }
 
-            reciboDao.insertarConDetalles(r);
+            try {
+                reciboDao.insertarConDetalles(r);
+                request.getSession().setAttribute("alertaSuccess", "El recibo mensual se emitió y notificó correctamente.");
+            } catch (Exception e) {
+                String errorMsg = e.getMessage() != null ? e.getMessage() : "";
+                if (errorMsg.contains("uq_usuario_periodo") || errorMsg.contains("violates unique constraint") || errorMsg.contains("restricción de unicidad")) {
+                    request.getSession().setAttribute("alertaError", "Error: Ya existe un recibo de mantenimiento emitido para este residente en el periodo seleccionado.");
+                } else {
+                    request.getSession().setAttribute("alertaError", "No se pudo procesar la emisión. Causa técnica: " + errorMsg);
+                }
+            }
+            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
 
         } else if ("declararPago".equals(accion)) {
-            // Flujo del Inquilino: Subir voucher y registrar transferencia
             int reciboId = Integer.parseInt(request.getParameter("recibo_id"));
             String nroOp = request.getParameter("nro_operacion");
             String medio = request.getParameter("medio_pago");
 
-            // Subida física del archivo voucher usando las librerías del POM
             Part filePart = request.getPart("voucher_file");
             String fileName = "voucher_" + reciboId + "_" + System.currentTimeMillis() + ".jpg";
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+
+            String uploadPath = obtenerRutaAlmacenamiento();
 
             File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdir();
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
 
+            // Guardamos el voucher subido por el inquilino
             filePart.write(uploadPath + File.separator + fileName);
+
+            // Guardamos en la app para evitar el 404 instantáneo en caliente de Tomcat
+            String serverBackupPath = getServletContext().getRealPath("") + File.separator + "uploads";
+            File serverBackupDir = new File(serverBackupPath);
+            if (!serverBackupDir.exists()) {
+                serverBackupDir.mkdirs();
+            }
+            try {
+                filePart.write(serverBackupPath + File.separator + fileName);
+            } catch (Exception ignored) {}
+
             String rutaRelativaVoucher = "uploads/" + fileName;
 
             java.sql.Date fechaHoy = new java.sql.Date(System.currentTimeMillis());
             reciboDao.declararPago(reciboId, nroOp, medio, rutaRelativaVoucher, fechaHoy);
+            request.getSession().setAttribute("alertaSuccess", "Tu pago ha sido declarado con éxito. Esperando validación administrativa.");
+            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
         }
+    }
 
-        response.sendRedirect(request.getContextPath() + "/dashboard?modulo=boletas");
+    // Métodos auxiliares de limpieza de código para evitar redundancias
+    private Configuracion obtenerConfiguracionEmpresa() {
+        Configuracion conf = new Configuracion();
+        conf.setNombreCondominio("CONDOMINIO HABITECH SMART");
+        conf.setRuc("20601234567");
+        conf.setDireccion("Av. El Sol 1450, Lima");
+        conf.setCuentaBancaria("BCP - Cta: 191-9843210-0-54 / CCI: 002-191009843210054032");
+        return conf;
+    }
+
+    private String obtenerRutaAlmacenamiento() {
+        String realPath = getServletContext().getRealPath("/");
+        String uploadPath = "";
+
+        if (realPath.contains("target")) {
+            uploadPath = realPath.split("target")[0] + "src" + File.separator + "main" + File.separator + "webapp" + File.separator + "uploads";
+        } else if (realPath.contains("out")) {
+            uploadPath = realPath.split("out")[0] + "src" + File.separator + "main" + File.separator + "webapp" + File.separator + "uploads";
+        } else if (realPath.contains(".metadata")) {
+            uploadPath = realPath.split(".metadata")[0] + "src" + File.separator + "main" + File.separator + "webapp" + File.separator + "uploads";
+        } else {
+            uploadPath = realPath + File.separator + "uploads";
+        }
+        return uploadPath;
     }
 }

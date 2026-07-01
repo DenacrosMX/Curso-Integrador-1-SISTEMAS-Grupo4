@@ -204,3 +204,83 @@
     color: #64748b;
     font-style: italic;
 }
+
+/* ==========================================================================
+   EXTENSIONES PARA VISTA RESIDENTE Y MODAL (ARQUITECTURA HABITECH)
+   ========================================================================== */
+
+/* Tarjetas de lectura individuales para los comunicados del Residente */
+.comunicado-tarjeta-lectura {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    padding: 20px;
+    border-radius: 6px;
+    border-left: 4px solid #38bdf8;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.comunicado-tarjeta-lectura:hover {
+    border-color: #38bdf8;
+    transform: translateY(-2px);
+}
+
+.comunicado-tarjeta-lectura h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.comunicado-tarjeta-lectura p {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: pre-line;
+    margin: 12px 0 15px 0;
+}
+
+.comunicado-meta-footer {
+    padding-top: 10px;
+    border-top: 1px solid #334155;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Contenedor del Modal: Capa de superposición absoluta */
+#modalComunicadoUrgente {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.85);
+    display: flex !important; /* Fuerza el centrado elástico de la tarjeta */
+    justify-content: center;
+    align-items: center;
+    z-index: 999999 !important; /* Lo posiciona por encima de barras laterales y cabeceras */
+    backdrop-filter: blur(4px); /* Aplica el desenfoque estético al fondo */
+}
+
+/* Botón de cierre para el modal urgente */
+.btn-modal-cerrar {
+    background-color: #ef4444;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-modal-cerrar:hover {
+    background-color: #dc2626;
+}
+
+.btn-modal-cerrar:active {
+    transform: scale(0.98);
+}

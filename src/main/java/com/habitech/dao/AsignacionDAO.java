@@ -8,5 +8,5 @@ public interface AsignacionDao {
     List<Asignacion> listarTodas();
     Asignacion obtenerPorId(int id);
     boolean actualizar(Asignacion asignacion);
-    boolean finalizarAsignacion(int id); // Para el botón de dar de baja / salida
+    boolean finalizarAsignacion(int id);
 }

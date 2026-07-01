@@ -33,16 +33,16 @@ public class InfraestructuraController extends HttpServlet {
 
                 boolean eliminado = infraestructuraDao.eliminarLogico(id);
                 if (eliminado) {
-                    logger.info("Elemento estructural desactivado con éxito de la base de datos.");
+                    logger.info("El elemento con ID {} fue dado de baja lógicamente.", id);
                 } else {
-                    logger.warn("No se pudo desactivar el elemento con ID: {}", id);
+                    logger.warn("No se pudo dar de baja el elemento con ID {}.", id);
                 }
             }
-        } catch (NumberFormatException e) {
-            logger.error("Error al parsear el ID del elemento para eliminar", e);
+        } catch (Exception e) {
+            logger.error("Error en la operación GET del módulo de infraestructura", e);
         }
 
-        // Redirección limpia al dashboard conservando el módulo activo
+        // Redirección de control al dashboard principal con el foco en infraestructura
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=infraestructura");
     }
 
@@ -50,65 +50,67 @@ public class InfraestructuraController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Aseguramos la correcta codificación de caracteres en el procesamiento del formulario masivo
         request.setCharacterEncoding("UTF-8");
 
         String idParam = request.getParameter("id");
-        String configuracionIdParam = request.getParameter("configuracionMaestraId");
+        String configIdParam = request.getParameter("configuracionMaestraId");
         String tipoElemento = request.getParameter("tipoElemento");
         String torre = request.getParameter("torre");
-
-        // Parámetros dinámicos para el generador inteligente por rangos
         String pisoInicioParam = request.getParameter("nroPisoInicio");
         String pisoFinParam = request.getParameter("nroPisoFin");
-        String cantidadPorPisoParam = request.getParameter("cantidadRegistrada");
+        String cantidadParam = request.getParameter("cantidadRegistrada");
 
         try {
-            int configId = Integer.parseInt(configuracionIdParam);
-            String torreFinal = (torre == null || torre.trim().isEmpty()) ? "GENERAL" : torre.toUpperCase().trim();
-            int cantidadPorPiso = Integer.parseInt(cantidadPorPisoParam);
+            int configId = Integer.parseInt(configIdParam);
+            int cantidadPorPiso = Integer.parseInt(cantidadParam);
+
+            // CORRECCIÓN CLAVE: Remoción de la palabra restrictiva "GENERAL"
+            // Si el campo se deja vacío voluntariamente, se captura como una cadena limpia "".
+            // Si contiene texto, se procesa en mayúsculas estandarizadas.
+            String torreFinal = (torre == null || torre.trim().isEmpty()) ? "" : torre.toUpperCase().trim();
 
             if (idParam == null || idParam.trim().isEmpty()) {
                 // =================================================================
-                // OPERACIÓN: GENERACIÓN MASIVA POR RANGO (DEPARTAMENTOS / SÓTANOS)
+                // FLUJO A: MODO GENERACIÓN MASIVA POR RANGO DE NIVELES
                 // =================================================================
                 int pisoInicio = Integer.parseInt(pisoInicioParam);
 
-                // Si el piso final viene nulo o vacío por seguridad, lo igualamos al de inicio (inserta 1 solo piso)
+                // Si por alguna razón el piso fin no viene especificado en la petición, lo igualamos al inicio
                 int pisoFin = (pisoFinParam == null || pisoFinParam.trim().isEmpty())
-                        ? pisoInicio
-                        : Integer.parseInt(pisoFinParam);
+                        ? pisoInicio : Integer.parseInt(pisoFinParam);
 
-                logger.info("Iniciando motor de generación masiva de {} para la estructura {} desde el nivel {} al {}.",
-                        tipoElemento, torreFinal, pisoInicio, pisoFin);
+                logger.info("Iniciando generación masiva de infraestructura. Rango: {} al {}. Tipo: {}. Bloque: '{}'",
+                        pisoInicio, pisoFin, tipoElemento, torreFinal);
 
-                int registrosExitosos = 0;
+                // Determinamos la dirección del bucle (admite rangos hacia arriba o hacia sótanos)
+                int menor = Math.min(pisoInicio, pisoFin);
+                int mayor = Math.max(pisoInicio, pisoFin);
 
-                // El ciclo for procesa de forma natural números negativos (sótanos), cero y positivos
-                for (int piso = pisoInicio; piso <= pisoFin; piso++) {
-                    InventarioInfraestructura elemento = new InventarioInfraestructura();
-                    elemento.setConfiguracionMaestraId(configId);
-                    elemento.setTipoElemento(tipoElemento);
-                    elemento.setTorre(torreFinal);
-                    elemento.setNroPiso(piso);
-                    elemento.setCantidadRegistrada(cantidadPorPiso);
+                for (int i = menor; i <= mayor; i++) {
+                    InventarioInfraestructura nuevoElemento = new InventarioInfraestructura();
+                    nuevoElemento.setConfiguracionMaestraId(configId);
+                    nuevoElemento.setTipoElemento(tipoElemento);
+                    nuevoElemento.setTorre(torreFinal);
+                    nuevoElemento.setNroPiso(i);
+                    nuevoElemento.setCantidadRegistrada(cantidadPorPiso);
 
-                    boolean insertado = infraestructuraDao.insertar(elemento);
-                    if (insertado) {
-                        registrosExitosos++;
+                    boolean insertado = infraestructuraDao.insertar(nuevoElemento);
+                    if (!insertado) {
+                        logger.error("Fallo crítico insertando el piso {} en la generación masiva.", i);
                     }
                 }
-                logger.info("Motor masivo apagado. Se crearon exitosamente un total de {} registros de piso.", registrosExitosos);
+                logger.info("Procesamiento masivo de infraestructura completado de forma exitosa.");
 
             } else {
                 // =================================================================
-                // OPERACIÓN: ACTUALIZACIÓN INDIVIDUAL DE UN REGISTRO EXISTENTE
+                // FLUJO B: ACTUALIZACIÓN INDIVIDUAL DE UN REGISTRO EXISTENTE
                 // =================================================================
                 InventarioInfraestructura elemento = new InventarioInfraestructura();
                 elemento.setId(Integer.parseInt(idParam));
                 elemento.setConfiguracionMaestraId(configId);
                 elemento.setTipoElemento(tipoElemento);
                 elemento.setTorre(torreFinal);
-                // En modo edición individual, tomamos el valor del único input disponible (pisoInicio)
                 elemento.setNroPiso(Integer.parseInt(pisoInicioParam));
                 elemento.setCantidadRegistrada(cantidadPorPiso);
 

@@ -46,8 +46,9 @@
 
                 <div class="form-group col-4">
                     <label for="torre">Torre / Bloque</label>
-                    <input type="text" name="torre" id="torre" placeholder="Ej: TORRE A, SÓTANOS"
-                           value="${not empty infraSeleccionada ? infraSeleccionada.torre : 'GENERAL'}" required class="form-control">
+                    <%-- CORREGIDO: value ahora está vacío por defecto en lugar de inyectar 'GENERAL' y ya no es obligatorio (required) --%>
+                    <input type="text" name="torre" id="torre" placeholder="Ej: TORRE A, BLOQUE B (Opcional)"
+                           value="${not empty infraSeleccionada ? infraSeleccionada.torre : ''}" class="form-control">
                 </div>
             </div>
 
@@ -121,7 +122,17 @@
                                 <td>${item.id}</td>
                                 <td class="text-bold">${item.nombreCondominio}</td>
                                 <td><span class="badge-tipo">${item.tipoElemento}</span></td>
-                                <td>${item.torre}</td>
+                                <td>
+                                    <%-- CORREGIDO: Si el campo de la torre está vacío o en blanco en la base de datos, muestra un texto en cursiva unificado en vez de una celda vacía --%>
+                                    <c:choose>
+                                        <c:when test="${not empty item.torre && item.torre.trim() != ''}">
+                                            ${item.torre}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span style="color:#888; font-style:italic;">S/N</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
                                 <td>
                                     <c:choose>
                                         <c:when test="${item.nroPiso < 0}">Sótano ${item.nroPiso * -1}</c:when>

@@ -193,19 +193,21 @@ select.form-control option {
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.05em;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .badge-cantidad {
     background-color: #0f172a;
     color: #38bdf8;
     border: 1px solid #0369a1;
-    padding: 4px 10px;       /* Ajuste ligero de padding interno */
+    padding: 4px 10px;
     border-radius: 6px;
     font-family: monospace;
     font-size: 0.9rem;
     font-weight: 600;
-    display: inline-block;   /* Asegura comportamiento de bloque en línea */
-    white-space: nowrap;     /* TRUCO MAESTRO: Impide terminantemente que el texto se parta en dos líneas */
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .badge-estado {
@@ -215,6 +217,7 @@ select.form-control option {
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.03em;
+    white-space: nowrap;
 }
 
 .badge-estado.activo {
