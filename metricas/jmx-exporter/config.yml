@@ -1,0 +1,76 @@
+---
+# JMX Exporter - Solo metricas de Tomcat (las de JVM se registran automaticamente)
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+
+rules:
+  # Tomcat - Requests globales
+  - pattern: 'Catalina<type=GlobalRequestProcessor, name="(\w+)-\w+-(\d+)"><>requestCount'
+    name: tomcat_request_count
+    labels:
+      connector: $1
+      port: $2
+    type: COUNTER
+
+  - pattern: 'Catalina<type=GlobalRequestProcessor, name="(\w+)-\w+-(\d+)"><>errorCount'
+    name: tomcat_error_count
+    labels:
+      connector: $1
+      port: $2
+    type: COUNTER
+
+  - pattern: 'Catalina<type=GlobalRequestProcessor, name="(\w+)-\w+-(\d+)"><>processingTime'
+    name: tomcat_processing_time_ms
+    labels:
+      connector: $1
+      port: $2
+    type: COUNTER
+
+  - pattern: 'Catalina<type=GlobalRequestProcessor, name="(\w+)-\w+-(\d+)"><>bytesSent'
+    name: tomcat_bytes_sent
+    labels:
+      connector: $1
+      port: $2
+    type: COUNTER
+
+  - pattern: 'Catalina<type=GlobalRequestProcessor, name="(\w+)-\w+-(\d+)"><>bytesReceived'
+    name: tomcat_bytes_received
+    labels:
+      connector: $1
+      port: $2
+    type: COUNTER
+
+  # Tomcat - Sesiones
+  - pattern: 'Catalina<type=Manager, host=localhost, context=(.+)><>activeSessions'
+    name: tomcat_active_sessions
+    labels:
+      context: $1
+    type: GAUGE
+
+  - pattern: 'Catalina<type=Manager, host=localhost, context=(.+)><>sessionCounter'
+    name: tomcat_session_total
+    labels:
+      context: $1
+    type: COUNTER
+
+  # Tomcat - Thread Pool
+  - pattern: 'Catalina<type=ThreadPool, name="(\w+)-\w+-(\d+)"><>currentThreadCount'
+    name: tomcat_threadpool_current
+    labels:
+      connector: $1
+      port: $2
+    type: GAUGE
+
+  - pattern: 'Catalina<type=ThreadPool, name="(\w+)-\w+-(\d+)"><>currentThreadsBusy'
+    name: tomcat_threadpool_busy
+    labels:
+      connector: $1
+      port: $2
+    type: GAUGE
+
+  - pattern: 'Catalina<type=ThreadPool, name="(\w+)-\w+-(\d+)"><>maxThreads'
+    name: tomcat_threadpool_max
+    labels:
+      connector: $1
+      port: $2
+    type: GAUGE

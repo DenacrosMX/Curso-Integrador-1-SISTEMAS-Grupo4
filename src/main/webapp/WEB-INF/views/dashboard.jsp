@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -49,9 +51,13 @@
                         <li><a href="${pageContext.request.contextPath}/dashboard?modulo=boletas" class="nav-link ${moduloActivo == 'boletas' ? 'active' : ''}">Recibos</a></li>
                     </c:if>
 
-                    <%-- Visibilidad para Módulos de Operación: ADMIN_SISTEMA y CONSERJE --%>
+                    <%-- Visibilidad para Visitas: ADMIN_SISTEMA y CONSERJE --%>
                     <c:if test="${usuarioLogueado.rol == 'ADMIN_SISTEMA' || usuarioLogueado.rol == 'CONSERJE'}">
                         <li><a href="${pageContext.request.contextPath}/dashboard?modulo=visitas" class="nav-link ${moduloActivo == 'visitas' ? 'active' : ''}">Visitas</a></li>
+                    </c:if>
+
+                    <%-- Visibilidad para Incidencias: ADMIN_SISTEMA, CONSERJE y RESIDENTE --%>
+                    <c:if test="${usuarioLogueado.rol == 'ADMIN_SISTEMA' || usuarioLogueado.rol == 'CONSERJE' || usuarioLogueado.rol == 'RESIDENTE'}">
                         <li><a href="${pageContext.request.contextPath}/dashboard?modulo=incidencias" class="nav-link ${moduloActivo == 'incidencias' ? 'active' : ''}">Incidencias</a></li>
                     </c:if>
 
@@ -109,7 +115,7 @@
                     <jsp:include page="visitas.jsp" />
                 </c:when>
 
-                <c:when test="${moduloActivo == 'incidencias' && (usuarioLogueado.rol == 'ADMIN_SISTEMA' || usuarioLogueado.rol == 'CONSERJE')}">
+                <c:when test="${moduloActivo == 'incidencias' && (usuarioLogueado.rol == 'ADMIN_SISTEMA' || usuarioLogueado.rol == 'CONSERJE' || usuarioLogueado.rol == 'RESIDENTE')}">
                     <jsp:include page="incidencias.jsp" />
                 </c:when>
 
@@ -128,46 +134,67 @@
                             <p>Estatus general del ecosistema residencial Habitech en tiempo real.</p>
                         </div>
 
-                        <div class="kpi-grid">
-                            <div class="kpi-card">
-                                <span class="kpi-category">Comunidad</span>
-                                <h3 class="kpi-value">${kpiUsuarios}</h3>
-                                <span class="kpi-status status-green">● Residentes Activos</span>
+                        <%-- CONDICIONAL: Los KPIs solo se muestran para administradores del sistema --%>
+                        <c:if test="${usuarioLogueado.rol == 'ADMIN_SISTEMA'}">
+                            <div class="kpi-grid">
+                                <div class="kpi-card">
+                                    <span class="kpi-category">Comunidad</span>
+                                    <h3 class="kpi-value">${kpiUsuarios}</h3>
+                                    <span class="kpi-status status-green">● Residentes Activos</span>
+                                </div>
+                                <div class="kpi-card">
+                                    <span class="kpi-category">Finanzas Matriz</span>
+                                    <h3 class="kpi-value">S/. ${kpiRecaudado}</h3>
+                                    <span class="kpi-status status-blue">Recaudación Total</span>
+                                </div>
+                                <div class="kpi-card">
+                                    <span class="kpi-category">Incidencias Críticas</span>
+                                    <h3 class="kpi-value value-red">${kpiIncidencias}</h3>
+                                    <span class="kpi-status status-orange">Requieren atención</span>
+                                </div>
+                                <div class="kpi-card">
+                                    <span class="kpi-category">Áreas Comunes</span>
+                                    <h3 class="kpi-value value-purple">${kpiReservas}</h3>
+                                    <span class="kpi-status status-gray">Reservadas hoy</span>
+                                </div>
                             </div>
-                            <div class="kpi-card">
-                                <span class="kpi-category">Finanzas Matriz</span>
-                                <h3 class="kpi-value">S/. ${kpiRecaudado}</h3>
-                                <span class="kpi-status status-blue">Recaudación Total</span>
-                            </div>
-                            <div class="kpi-card">
-                                <span class="kpi-category">Incidencias Críticas</span>
-                                <h3 class="kpi-value value-red">${kpiIncidencias}</h3>
-                                <span class="kpi-status status-orange">Requieren atención</span>
-                            </div>
-                            <div class="kpi-card">
-                                <span class="kpi-category">Áreas Comunes</span>
-                                <h3 class="kpi-value value-purple">${kpiReservas}</h3>
-                                <span class="kpi-status status-gray">Reservadas hoy</span>
-                            </div>
-                        </div>
+                        </c:if>
 
-                        <div class="home-panels">
+                        <div class="home-panels" <c:if test="${usuarioLogueado.rol == 'RESIDENTE'}">style="margin-top: 20px;"</c:if>>
                             <div class="panel-main">
                                 <h3>📢 Últimos Comunicados Oficiales</h3>
-                                <div class="comunicado-item">
-                                    <div class="comunicado-meta">
-                                        <span class="comunicado-titulo">Mantenimiento de Ascensores</span>
-                                        <span class="comunicado-fecha">Hoy, 08:30 AM</span>
-                                    </div>
-                                    <p>Se realizará la revisión técnica bimestral de los ascensores de la Torre A de 10:00 AM a 12:00 PM.</p>
-                                </div>
-                                <div class="comunicado-item">
-                                    <div class="comunicado-meta">
-                                        <span class="comunicado-titulo">Corte Programado de Agua</span>
-                                        <span class="comunicado-fecha">Ayer</span>
-                                    </div>
-                                    <p>Sedapal informa trabajos en la red matriz de la avenida principal. Tomar previsiones del caso.</p>
-                                </div>
+
+                                <c:choose>
+                                    <c:when test="${not empty ultimosComunicados}">
+                                        <c:forEach var="comunicado" items="${ultimosComunicados}">
+                                            <div class="comunicado-item">
+                                                <div class="comunicado-meta">
+                                                    <span class="comunicado-titulo"><c:out value="${comunicado.titulo}" /></span>
+                                                    <span class="comunicado-fecha">
+                                                        <c:choose>
+                                                            <c:when test="${not empty comunicado.fechaPublicacion}">
+                                                                <c:set var="strFecha" value="${comunicado.fechaPublicacion.toString()}" />
+                                                                <c:set var="cleanFecha" value="${fn:substring(strFecha, 0, 19)}" />
+                                                                <c:set var="finalFecha" value="${fn:replace(cleanFecha, 'T', ' ')}" />
+                                                                <fmt:parseDate value="${finalFecha}" pattern="yyyy-MM-dd HH:mm:ss" var="fechaParseada" timeZone="UTC" />
+                                                                <fmt:formatDate value="${fechaParseada}" pattern="dd/MM/yyyy hh:mm a" timeZone="GMT-5" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                Reciente
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </span>
+                                                </div>
+                                                <p><c:out value="${comunicado.contenido}" /></p>
+                                            </div>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="comunicado-item" style="text-align: center; padding: 20px;">
+                                            <p style="color: #64748b;">No hay comunicados oficiales emitidos recientemente.</p>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
 
                             <div class="panel-side">

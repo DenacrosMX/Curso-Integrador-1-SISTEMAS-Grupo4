@@ -63,7 +63,7 @@ public class AuthFilter extends HttpFilter {
             response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }
-        if (("/visitas".equals(path) || "/incidencias".equals(path)) && "RESIDENTE".equals(rol)) {
+        if ("/visitas".equals(path) && "RESIDENTE".equals(rol)) {
             response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }
@@ -83,7 +83,7 @@ public class AuthFilter extends HttpFilter {
 
                 if ("RESIDENTE".equals(rol)) {
                     // El residente NO puede entrar a estos módulos internos
-                    if (Arrays.asList("usuarios", "configuracion", "infraestructura", "asignaciones", "visitas", "incidencias").contains(modulo)) {
+                    if (Arrays.asList("usuarios", "configuracion", "infraestructura", "asignaciones", "visitas").contains(modulo)) {
                         response.sendRedirect(request.getContextPath() + "/dashboard");
                         return;
                     }

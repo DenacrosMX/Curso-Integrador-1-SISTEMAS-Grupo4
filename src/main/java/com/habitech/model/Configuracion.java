@@ -4,7 +4,6 @@ import java.time.ZonedDateTime;
 
 public class Configuracion {
 
-    // Atributos privados (Encapsulamiento)
     private Integer id;
     private String nombreCondominio;
     private String direccion;
@@ -14,11 +13,9 @@ public class Configuracion {
     private ZonedDateTime fechaRegistro;
     private String estado;
 
-    // Constructor vacío
     public Configuracion() {
     }
 
-    // Constructor completo
     public Configuracion(Integer id, String nombreCondominio, String direccion, String ruc,
                          String cuentaBancaria, int diaVencimientoRecibo, ZonedDateTime fechaRegistro, String estado) {
         this.id = id;
@@ -31,7 +28,6 @@ public class Configuracion {
         this.estado = estado;
     }
 
-    // Métodos Getters y Setters
     public Integer getId() {
         return id;
     }

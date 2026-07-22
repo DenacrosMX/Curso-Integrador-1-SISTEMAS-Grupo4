@@ -19,12 +19,17 @@ public class ConfiguracionController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Captura baja lógica si viene por GET de la tabla de historial
         String accion = request.getParameter("accion");
+
         if ("eliminar".equals(accion)) {
-            int idEliminar = Integer.parseInt(request.getParameter("id"));
-            configuracionDao.eliminarLogico(idEliminar);
+            try {
+                int idEliminar = Integer.parseInt(request.getParameter("id"));
+                configuracionDao.eliminarLogico(idEliminar);
+            } catch (NumberFormatException e) {
+                System.err.println("[Error] ID inválido para eliminación de configuración.");
+            }
         }
+
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=configuracion");
     }
 
@@ -41,23 +46,25 @@ public class ConfiguracionController extends HttpServlet {
         String cuentaBancaria = request.getParameter("cuentaBancaria");
         String diaVencimientoStr = request.getParameter("diaVencimientoRecibo");
 
-        Configuracion config = new Configuracion();
-        config.setNombreCondominio(nombreCondominio);
-        config.setDireccion(direccion);
-        config.setRuc(ruc);
-        config.setCuentaBancaria(cuentaBancaria);
-        config.setDiaVencimientoRecibo(Integer.parseInt(diaVencimientoStr));
+        try {
+            Configuracion config = new Configuracion();
+            config.setNombreCondominio(nombreCondominio);
+            config.setDireccion(direccion);
+            config.setRuc(ruc);
+            config.setCuentaBancaria(cuentaBancaria);
+            config.setDiaVencimientoRecibo(Integer.parseInt(diaVencimientoStr));
 
-        if (idStr == null || idStr.trim().isEmpty()) {
-            // Nuevo Registro
-            configuracionDao.insertar(config);
-        } else {
-            // Actualización de registro existente
-            config.setId(Integer.parseInt(idStr));
-            configuracionDao.actualizar(config);
+            if (idStr == null || idStr.trim().isEmpty()) {
+                configuracionDao.insertar(config);
+            } else {
+                config.setId(Integer.parseInt(idStr.trim()));
+                configuracionDao.actualizar(config);
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("[Error] Error de formato en los datos numéricos enviados a configuración.");
+            e.printStackTrace();
         }
 
-        // Redirección limpia al Dashboard para ver el historial actualizado
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=configuracion");
     }
 }

@@ -38,8 +38,9 @@
                             <select name="usuario_id" id="selectResidente" required class="form-control">
                                 <option value="" data-monto="">-- Seleccione un residente activo --</option>
                                 <c:forEach var="asig" items="${asignaciones}">
+                                    <%-- CORREGIDO: Se reemplazó codigoUnidadEspecifica por codigoUnidad --%>
                                     <option value="${asig.usuarioId}" data-monto="${asig.precioMensualPactado}">
-                                        ${asig.nombreUsuario} - ${asig.codigoUnidadEspecifica}
+                                        ${asig.nombreUsuario} - ${asig.codigoUnidad}
                                     </option>
                                 </c:forEach>
                             </select>

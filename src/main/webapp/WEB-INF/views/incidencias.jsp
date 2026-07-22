@@ -44,8 +44,9 @@
                         %>
                                     <option value="<%= asig.getId() %>">
                                         <%= asig.getDetalleInfraestructura() != null ? asig.getDetalleInfraestructura() : "Unidad #" + asig.getId() %>
-                                        <% if (asig.getCodigoUnidadEspecifica() != null && !asig.getCodigoUnidadEspecifica().isEmpty()) { %>
-                                            (<%= asig.getCodigoUnidadEspecifica() %>)
+                                        <%-- CORREGIDO: Se reemplaza getCodigoUnidadEspecifica() por getCodigoUnidad() --%>
+                                        <% if (asig.getCodigoUnidad() != null && !asig.getCodigoUnidad().isEmpty()) { %>
+                                            (<%= asig.getCodigoUnidad() %>)
                                         <% } %>
                                         [<%= asig.getNombreUsuario() != null ? asig.getNombreUsuario() : "Sin Residente" %>]
                                     </option>

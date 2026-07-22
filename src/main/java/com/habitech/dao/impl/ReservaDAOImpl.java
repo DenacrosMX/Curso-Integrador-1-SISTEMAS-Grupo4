@@ -24,7 +24,7 @@ public class ReservaDaoImpl implements ReservaDao {
 
             ps.setInt(1, reserva.getUsuarioId());
             ps.setInt(2, reserva.getInventarioMaestroId());
-            ps.setObject(3, reserva.getFechaReserva()); // Inyección directa de LocalDate
+            ps.setObject(3, reserva.getFechaReserva());
             ps.setString(4, reserva.getTurno());
             ps.setString(5, reserva.getEstado());
 
@@ -38,8 +38,6 @@ public class ReservaDaoImpl implements ReservaDao {
     @Override
     public List<Reserva> listarTodas() {
         List<Reserva> lista = new ArrayList<>();
-        // Query avanzada que cruza tablas para armar la grilla visual informativa
-        // CORRECCIÓN EXACTA: Se cambia i.nombre_item por i.tipo_elemento basado en el DDL real
         String sql = "SELECT r.id, r.usuario_id, r.inventario_maestro_id, r.fecha_reserva, r.turno, r.estado, r.fecha_registro, "
                 + "       (u.nombres || ' ' || u.apellidos) AS nombre_completo, i.tipo_elemento AS area_comun "
                 + "FROM reservas r "
@@ -65,7 +63,6 @@ public class ReservaDaoImpl implements ReservaDao {
                     r.setFechaRegistro(regTime.toInstant().atOffset(ZoneOffset.UTC));
                 }
 
-                // Seteamos los campos adicionales del JOIN
                 r.setNombreUsuario(rs.getString("nombre_completo"));
                 r.setNombreAreaComun(rs.getString("area_comun"));
 

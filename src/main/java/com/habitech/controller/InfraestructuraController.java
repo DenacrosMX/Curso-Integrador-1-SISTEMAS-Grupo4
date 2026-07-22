@@ -42,7 +42,6 @@ public class InfraestructuraController extends HttpServlet {
             logger.error("Error en la operación GET del módulo de infraestructura", e);
         }
 
-        // Redirección de control al dashboard principal con el foco en infraestructura
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=infraestructura");
     }
 
@@ -50,7 +49,6 @@ public class InfraestructuraController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Aseguramos la correcta codificación de caracteres en el procesamiento del formulario masivo
         request.setCharacterEncoding("UTF-8");
 
         String idParam = request.getParameter("id");
@@ -64,26 +62,16 @@ public class InfraestructuraController extends HttpServlet {
         try {
             int configId = Integer.parseInt(configIdParam);
             int cantidadPorPiso = Integer.parseInt(cantidadParam);
-
-            // CORRECCIÓN CLAVE: Remoción de la palabra restrictiva "GENERAL"
-            // Si el campo se deja vacío voluntariamente, se captura como una cadena limpia "".
-            // Si contiene texto, se procesa en mayúsculas estandarizadas.
             String torreFinal = (torre == null || torre.trim().isEmpty()) ? "" : torre.toUpperCase().trim();
 
             if (idParam == null || idParam.trim().isEmpty()) {
-                // =================================================================
-                // FLUJO A: MODO GENERACIÓN MASIVA POR RANGO DE NIVELES
-                // =================================================================
                 int pisoInicio = Integer.parseInt(pisoInicioParam);
-
-                // Si por alguna razón el piso fin no viene especificado en la petición, lo igualamos al inicio
                 int pisoFin = (pisoFinParam == null || pisoFinParam.trim().isEmpty())
                         ? pisoInicio : Integer.parseInt(pisoFinParam);
 
                 logger.info("Iniciando generación masiva de infraestructura. Rango: {} al {}. Tipo: {}. Bloque: '{}'",
                         pisoInicio, pisoFin, tipoElemento, torreFinal);
 
-                // Determinamos la dirección del bucle (admite rangos hacia arriba o hacia sótanos)
                 int menor = Math.min(pisoInicio, pisoFin);
                 int mayor = Math.max(pisoInicio, pisoFin);
 
@@ -103,9 +91,6 @@ public class InfraestructuraController extends HttpServlet {
                 logger.info("Procesamiento masivo de infraestructura completado de forma exitosa.");
 
             } else {
-                // =================================================================
-                // FLUJO B: ACTUALIZACIÓN INDIVIDUAL DE UN REGISTRO EXISTENTE
-                // =================================================================
                 InventarioInfraestructura elemento = new InventarioInfraestructura();
                 elemento.setId(Integer.parseInt(idParam));
                 elemento.setConfiguracionMaestraId(configId);
@@ -128,7 +113,6 @@ public class InfraestructuraController extends HttpServlet {
             logger.error("Error grave en el hilo de procesamiento del InfraestructuraController", e);
         }
 
-        // Redirección limpia de retorno al panel para refrescar la grilla de datos
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=infraestructura");
     }
 }

@@ -23,8 +23,12 @@ public class ReservaController extends HttpServlet {
         String accion = request.getParameter("accion");
 
         if ("cancelar".equals(accion) && request.getParameter("id") != null) {
-            int idCancelar = Integer.parseInt(request.getParameter("id"));
-            reservaDao.cancelarReserva(idCancelar);
+            try {
+                int idCancelar = Integer.parseInt(request.getParameter("id"));
+                reservaDao.cancelarReserva(idCancelar);
+            } catch (NumberFormatException e) {
+                System.err.println("[Error] ID inválido para cancelación.");
+            }
         }
 
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas");
@@ -36,27 +40,31 @@ public class ReservaController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        int usuarioId = Integer.parseInt(request.getParameter("usuario_id"));
-        int inventarioId = Integer.parseInt(request.getParameter("inventario_maestro_id"));
-        LocalDate fecha = LocalDate.parse(request.getParameter("fecha_reserva"));
-        String turno = request.getParameter("turno");
-        String estado = request.getParameter("estado");
+        try {
+            int usuarioId = Integer.parseInt(request.getParameter("usuario_id"));
+            int inventarioId = Integer.parseInt(request.getParameter("inventario_maestro_id"));
+            LocalDate fecha = LocalDate.parse(request.getParameter("fecha_reserva"));
+            String turno = request.getParameter("turno");
+            String estado = request.getParameter("estado");
 
-        // Validar duplicado antes de insertar
-        if (reservaDao.existeReserva(inventarioId, fecha, turno)) {
-            // Redireccionamos enviando una alerta de agenda ocupada
-            response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas&error=duplicado");
-            return;
+            if (reservaDao.existeReserva(inventarioId, fecha, turno)) {
+                response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas&error=duplicado");
+                return;
+            }
+
+            Reserva r = new Reserva();
+            r.setUsuarioId(usuarioId);
+            r.setInventarioMaestroId(inventarioId);
+            r.setFechaReserva(fecha);
+            r.setTurno(turno);
+            r.setEstado(estado);
+
+            reservaDao.insertar(r);
+
+        } catch (Exception e) {
+            System.err.println("[Error] Error al procesar la reserva.");
+            e.printStackTrace();
         }
-
-        Reserva r = new Reserva();
-        r.setUsuarioId(usuarioId);
-        r.setInventarioMaestroId(inventarioId);
-        r.setFechaReserva(fecha);
-        r.setTurno(turno);
-        r.setEstado(estado);
-
-        reservaDao.insertar(r);
 
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=reservas");
     }

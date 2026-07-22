@@ -3,6 +3,7 @@ package com.habitech.model;
 import java.time.LocalDateTime;
 
 public class Visita {
+
     private int id;
     private int asignacionId;
     private Integer conserjeId;
@@ -13,51 +14,114 @@ public class Visita {
     private LocalDateTime fechaHoraIngreso;
     private LocalDateTime fechaHoraOut;
     private String estado;
-
-    // Campos de apoyo para los JOINS en la UI
     private String detalleInfraestructura;
     private String codigoUnidadEspecifica;
     private String nombreConserje;
 
-    public Visita() {}
+    public Visita() {
+    }
 
-    // Getters y Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public int getAsignacionId() { return asignacionId; }
-    public void setAsignacionId(int asignacionId) { this.asignacionId = asignacionId; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public Integer getConserjeId() { return conserjeId; }
-    public void setConserjeId(Integer conserjeId) { this.conserjeId = conserjeId; }
+    public int getAsignacionId() {
+        return asignacionId;
+    }
 
-    public String getNombreVisitante() { return nombreVisitante; }
-    public void setNombreVisitante(String nombreVisitante) { this.nombreVisitante = nombreVisitante; }
+    public void setAsignacionId(int asignacionId) {
+        this.asignacionId = asignacionId;
+    }
 
-    public String getDniVisitante() { return dniVisitante; }
-    public void setDniVisitante(String dniVisitante) { this.dniVisitante = dniVisitante; }
+    public Integer getConserjeId() {
+        return conserjeId;
+    }
 
-    public String getPlacaVehiculo() { return placaVehiculo; }
-    public void setPlacaVehiculo(String placaVehiculo) { this.placaVehiculo = placaVehiculo; }
+    public void setConserjeId(Integer conserjeId) {
+        this.conserjeId = conserjeId;
+    }
 
-    public String getTipoIngreso() { return tipoIngreso; }
-    public void setTipoIngreso(String tipoIngreso) { this.tipoIngreso = tipoIngreso; }
+    public String getNombreVisitante() {
+        return nombreVisitante;
+    }
 
-    public LocalDateTime getFechaHoraIngreso() { return fechaHoraIngreso; }
-    public void setFechaHoraIngreso(LocalDateTime fechaHoraIngreso) { this.fechaHoraIngreso = fechaHoraIngreso; }
+    public void setNombreVisitante(String nombreVisitante) {
+        this.nombreVisitante = nombreVisitante;
+    }
 
-    public LocalDateTime getFechaHoraOut() { return fechaHoraOut; }
-    public void setFechaHoraOut(LocalDateTime fechaHoraOut) { this.fechaHoraOut = fechaHoraOut; }
+    public String getDniVisitante() {
+        return dniVisitante;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setDniVisitante(String dniVisitante) {
+        this.dniVisitante = dniVisitante;
+    }
 
-    public String getDetalleInfraestructura() { return detalleInfraestructura; }
-    public void setDetalleInfraestructura(String detalleInfraestructura) { this.detalleInfraestructura = detalleInfraestructura; }
+    public String getPlacaVehiculo() {
+        return placaVehiculo;
+    }
 
-    public String getCodigoUnidadEspecifica() { return codigoUnidadEspecifica; }
-    public void setCodigoUnidadEspecifica(String codigoUnidadEspecifica) { this.codigoUnidadEspecifica = codigoUnidadEspecifica; }
+    public void setPlacaVehiculo(String placaVehiculo) {
+        this.placaVehiculo = placaVehiculo;
+    }
 
-    public String getNombreConserje() { return nombreConserje; }
-    public void setNombreConserje(String nombreConserje) { this.nombreConserje = nombreConserje; }
+    public String getTipoIngreso() {
+        return tipoIngreso;
+    }
+
+    public void setTipoIngreso(String tipoIngreso) {
+        this.tipoIngreso = tipoIngreso;
+    }
+
+    public LocalDateTime getFechaHoraIngreso() {
+        return fechaHoraIngreso;
+    }
+
+    public void setFechaHoraIngreso(LocalDateTime fechaHoraIngreso) {
+        this.fechaHoraIngreso = fechaHoraIngreso;
+    }
+
+    public LocalDateTime getFechaHoraOut() {
+        return fechaHoraOut;
+    }
+
+    public void setFechaHoraOut(LocalDateTime fechaHoraOut) {
+        this.fechaHoraOut = fechaHoraOut;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getDetalleInfraestructura() {
+        return detalleInfraestructura;
+    }
+
+    public void setDetalleInfraestructura(String detalleInfraestructura) {
+        this.detalleInfraestructura = detalleInfraestructura;
+    }
+
+    public String getCodigoUnidadEspecifica() {
+        return codigoUnidadEspecifica;
+    }
+
+    public void setCodigoUnidadEspecifica(String codigoUnidadEspecifica) {
+        this.codigoUnidadEspecifica = codigoUnidadEspecifica;
+    }
+
+    public String getNombreConserje() {
+        return nombreConserje;
+    }
+
+    public void setNombreConserje(String nombreConserje) {
+        this.nombreConserje = nombreConserje;
+    }
 }

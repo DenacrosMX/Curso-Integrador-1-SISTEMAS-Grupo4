@@ -27,7 +27,7 @@ public class ComunicadoDaoImpl implements ComunicadoDao {
             ps.setString(2, comunicado.getTitulo());
             ps.setString(3, comunicado.getContenido());
             ps.setString(4, comunicado.getAlcance());
-            ps.setString(5, comunicado.getTorreDestino()); // Puede ser null si el alcance es GLOBAL
+            ps.setString(5, comunicado.getTorreDestino());
             ps.setString(6, comunicado.getCategoria());
             ps.setString(7, comunicado.getEstado());
 
@@ -47,8 +47,12 @@ public class ComunicadoDaoImpl implements ComunicadoDao {
     @Override
     public List<Comunicado> listarTodos() {
         List<Comunicado> lista = new ArrayList<>();
+        // ACTUALIZADO: Filtrado estricto por vigencia y estado 'PUBLICADO'
         String sql = "SELECT id, usuario_id, titulo, contenido, alcance, torre_destino, categoria, estado, fecha_publicacion, fecha_expiracion "
-                + "FROM comunicados ORDER BY fecha_publicacion DESC";
+                + "FROM comunicados "
+                + "WHERE estado = 'PUBLICADO' "
+                + "AND (fecha_expiracion IS NULL OR fecha_expiracion > CURRENT_TIMESTAMP) "
+                + "ORDER BY fecha_publicacion DESC";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -126,8 +130,6 @@ public class ComunicadoDaoImpl implements ComunicadoDao {
     @Override
     public List<Comunicado> listarActivosParaResidentes(String torreResidente) {
         List<Comunicado> lista = new ArrayList<>();
-        // Query optimizada: Trae comunicados PUBLICADOS cuya fecha de expiración sea nula o futura,
-        // y que tengan alcance GLOBAL o coincidan con la torre específica del residente.
         String sql = "SELECT id, usuario_id, titulo, contenido, alcance, torre_destino, categoria, estado, fecha_publicacion, fecha_expiracion "
                 + "FROM comunicados "
                 + "WHERE estado = 'PUBLICADO' "
@@ -149,7 +151,6 @@ public class ComunicadoDaoImpl implements ComunicadoDao {
         return lista;
     }
 
-    // Método auxiliar privado para no repetir mapeo de columnas con tipos OffsetDateTime modernos
     private Comunicado mapearComunicado(ResultSet rs) throws SQLException {
         Timestamp pubTime = rs.getTimestamp("fecha_publicacion");
         Timestamp expTime = rs.getTimestamp("fecha_expiracion");

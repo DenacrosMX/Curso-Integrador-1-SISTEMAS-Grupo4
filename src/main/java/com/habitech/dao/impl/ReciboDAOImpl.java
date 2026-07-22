@@ -23,7 +23,9 @@ public class ReciboDaoImpl implements ReciboDao {
             String sqlCorrelativo = "SELECT COALESCE(MAX(id), 0) + 1 FROM recibos";
             int siguienteId = 1;
             try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sqlCorrelativo)) {
-                if (rs.next()) siguienteId = rs.getInt(1);
+                if (rs.next()) {
+                    siguienteId = rs.getInt(1);
+                }
             }
             String nroComprobante = String.format("#BP-%d-%04d", recibo.getAnioFacturado(), siguienteId);
             recibo.setNroComprobante(nroComprobante);
@@ -41,7 +43,9 @@ public class ReciboDaoImpl implements ReciboDao {
 
             int reciboId = 0;
             try (ResultSet rsKeys = psRecibo.getGeneratedKeys()) {
-                if (rsKeys.next()) reciboId = rsKeys.getInt(1);
+                if (rsKeys.next()) {
+                    reciboId = rsKeys.getInt(1);
+                }
             }
 
             String sqlDetalle = "INSERT INTO detalle_recibos (recibo_id, concepto_descripcion, monto_individual) VALUES (?, ?, ?)";
@@ -57,23 +61,36 @@ public class ReciboDaoImpl implements ReciboDao {
             conn.commit();
             return true;
         } catch (SQLException e) {
-            if (conn != null) { try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); } }
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             e.printStackTrace();
             return false;
         } finally {
             try {
-                if (psDetalle != null) psDetalle.close();
-                if (psRecibo != null) psRecibo.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) { e.printStackTrace(); }
+                if (psDetalle != null) {
+                    psDetalle.close();
+                }
+                if (psRecibo != null) {
+                    psRecibo.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public List<Recibo> listarTodo() {
-        // CORREGIDO: Se quitó u.dni de la consulta SQL
         return ejecutarListado("SELECT r.*, u.nombres AS nombre_residente, adm.nombres AS nombre_admin, " +
-                "i.torre, i.nro_piso, i.tipo_elemento, a.codigo_unidad_especifica " +
+                "i.torre, i.nro_piso, i.tipo_elemento, a.codigo_unidad " +
                 "FROM recibos r " +
                 "INNER JOIN usuarios u ON r.usuario_id = u.id " +
                 "INNER JOIN usuarios adm ON r.usuario_responsable_id = adm.id " +
@@ -84,9 +101,8 @@ public class ReciboDaoImpl implements ReciboDao {
 
     @Override
     public List<Recibo> listarPorInquilino(int usuarioId) {
-        // CORREGIDO: Se quitó u.dni de la consulta SQL
         return ejecutarListado("SELECT r.*, u.nombres AS nombre_residente, adm.nombres AS nombre_admin, " +
-                "i.torre, i.nro_piso, i.tipo_elemento, a.codigo_unidad_especifica " +
+                "i.torre, i.nro_piso, i.tipo_elemento, a.codigo_unidad " +
                 "FROM recibos r " +
                 "INNER JOIN usuarios u ON r.usuario_id = u.id " +
                 "INNER JOIN usuarios adm ON r.usuario_responsable_id = adm.id " +
@@ -105,15 +121,16 @@ public class ReciboDaoImpl implements ReciboDao {
                 Recibo r = mappearRecibo(rs);
                 lista.add(r);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return lista;
     }
 
     @Override
     public Recibo obtenerPorId(int id) {
-        // CORREGIDO: Se quitó u.dni de la consulta SQL
         String sql = "SELECT r.*, u.nombres AS nombre_residente, adm.nombres AS nombre_admin, " +
-                "i.torre, i.nro_piso, i.tipo_elemento, a.codigo_unidad_especifica " +
+                "i.torre, i.nro_piso, i.tipo_elemento, a.codigo_unidad " +
                 "FROM recibos r " +
                 "INNER JOIN usuarios u ON r.usuario_id = u.id " +
                 "INNER JOIN usuarios adm ON r.usuario_responsable_id = adm.id " +
@@ -129,7 +146,9 @@ public class ReciboDaoImpl implements ReciboDao {
                     return r;
                 }
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -162,7 +181,10 @@ public class ReciboDaoImpl implements ReciboDao {
             ps.setDate(4, fechaPago);
             ps.setInt(5, reciboId);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -173,7 +195,10 @@ public class ReciboDaoImpl implements ReciboDao {
             ps.setInt(2, adminId);
             ps.setInt(3, reciboId);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private Recibo mappearRecibo(ResultSet rs) throws SQLException {
@@ -191,16 +216,14 @@ public class ReciboDaoImpl implements ReciboDao {
         r.setMedioPago(rs.getString("medio_pago"));
         r.setArchivoVoucher(rs.getString("archivo_voucher"));
         r.setFechaPago(rs.getDate("fecha_pago"));
-
         r.setNombreResidente(rs.getString("nombre_residente"));
-        // CORREGIDO: Se eliminó la línea que mapeaba rs.getString("dni_residente") ya que no viene en el SQL
         r.setNombreAdmin(rs.getString("nombre_admin"));
 
         String torre = rs.getString("torre");
         if (torre != null) {
             int piso = rs.getInt("nro_piso");
             String textPiso = (piso < 0) ? "SÓTANO " + (piso * -1) : (piso == 0) ? "PLANTA BAJA" : "PISO " + piso;
-            r.setDetalleUnidad(rs.getString("codigo_unidad_especifica") + " (" + torre + " - " + textPiso + ")");
+            r.setDetalleUnidad(rs.getString("codigo_unidad") + " (" + torre + " - " + textPiso + ")");
         } else {
             r.setDetalleUnidad("Sin Unidad Asignada");
         }

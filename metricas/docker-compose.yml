@@ -1,0 +1,137 @@
+services:
+
+  # ============================================
+  # BASE DE DATOS
+  # ============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: habitech-postgres
+    environment:
+      POSTGRES_DB: habitech_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - habitech-net
+
+  # ============================================
+  # APLICACION HABITECH (Tomcat + JMX Exporter)
+  # ============================================
+  habitech-app:
+    build:
+      context: ..
+      dockerfile: metricas/Dockerfile
+    container_name: habitech-app
+    ports:
+      - "8080:8080"
+      - "9404:9404"
+    volumes:
+      - app_logs:/usr/local/tomcat/target/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - habitech-net
+
+  # ============================================
+  # EXPORTERS DE METRICAS
+  # ============================================
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.16.0
+    container_name: habitech-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:123456@postgres:5432/habitech_db?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - habitech-net
+
+  # ============================================
+  # PROMETHEUS (Metricas)
+  # ============================================
+  prometheus:
+    image: prom/prometheus:v3.4.1
+    container_name: habitech-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    networks:
+      - habitech-net
+
+  # ============================================
+  # LOKI (Logs)
+  # ============================================
+  loki:
+    image: grafana/loki:3.5.0
+    container_name: habitech-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - habitech-net
+
+  # ============================================
+  # PROMTAIL (Recolector de logs -> Loki)
+  # ============================================
+  promtail:
+    image: grafana/promtail:3.5.0
+    container_name: habitech-promtail
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - app_logs:/var/log/habitech:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - habitech-net
+
+  # ============================================
+  # GRAFANA (Dashboards y Alertas)
+  # ============================================
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: habitech-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: habitech2026
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - habitech-net
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  loki_data:
+  grafana_data:
+  app_logs:
+
+networks:
+  habitech-net:
+    driver: bridge

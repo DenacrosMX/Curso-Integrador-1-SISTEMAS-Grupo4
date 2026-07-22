@@ -2,13 +2,8 @@ package com.habitech.model;
 
 import java.time.OffsetDateTime;
 
-/**
- * Entidad que mapea fielmente la tabla 'comunicados' de PostgreSQL.
- * Diseñada bajo el estándar de JavaBean puro para compatibilidad con JSTL y tu capa DAO.
- */
 public class Comunicado {
 
-    // 1. Atributos Privados (Encapsulamiento de columnas)
     private Integer id;
     private Integer usuarioId;
     private String titulo;
@@ -20,11 +15,9 @@ public class Comunicado {
     private OffsetDateTime fechaPublicacion;
     private OffsetDateTime fechaExpiracion;
 
-    // 2. Constructor Vacío (Obligatorio para especificación JavaBean y formularios)
     public Comunicado() {
     }
 
-    // 3. Constructor Completo (Vital para instanciación rápida en el ResultSet del DAO)
     public Comunicado(Integer id, Integer usuarioId, String titulo, String contenido, String alcance,
                       String torreDestino, String categoria, String estado,
                       OffsetDateTime fechaPublicacion, OffsetDateTime fechaExpiracion) {
@@ -40,7 +33,6 @@ public class Comunicado {
         this.fechaExpiracion = fechaExpiracion;
     }
 
-    // 4. Métodos Getters y Setters (Nomenclatura CamelCase exacta para evaluar expresiones EL de JSTL)
     public Integer getId() {
         return id;
     }

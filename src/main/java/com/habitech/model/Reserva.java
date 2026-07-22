@@ -3,13 +3,8 @@ package com.habitech.model;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
-/**
- * Entidad que mapea la tabla 'reservas' de PostgreSQL.
- * Diseñada bajo el estándar JavaBean puro para integrarse con JSTL y tu capa DAO.
- */
 public class Reserva {
 
-    // 1. Atributos Privados
     private Integer id;
     private Integer usuarioId;
     private Integer inventarioMaestroId;
@@ -17,16 +12,12 @@ public class Reserva {
     private String turno;
     private String estado;
     private OffsetDateTime fechaRegistro;
-
-    // Atributos extra para JOINS visuales (Para mostrar Nombre de Usuario y Nombre del Área en las tablas)
     private String nombreUsuario;
     private String nombreAreaComun;
 
-    // 2. Constructor Vacío
     public Reserva() {
     }
 
-    // 3. Constructor Completo (Para el ResultSet del DAO)
     public Reserva(Integer id, Integer usuarioId, Integer inventarioMaestroId, LocalDate fechaReserva,
                    String turno, String estado, OffsetDateTime fechaRegistro) {
         this.id = id;
@@ -38,7 +29,6 @@ public class Reserva {
         this.fechaRegistro = fechaRegistro;
     }
 
-    // 4. Getters y Setters
     public Integer getId() {
         return id;
     }

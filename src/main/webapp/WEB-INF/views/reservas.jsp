@@ -16,6 +16,10 @@
     // Formateadores de fecha
     DateTimeFormatter formFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     DateTimeFormatter formRegistro = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    // Capturamos el usuario en sesión para validar permisos de cancelación
+    Usuario usuarioSesion = (Usuario) session.getAttribute("usuarioLogueado");
+    String rolUsuario = (usuarioSesion != null && usuarioSesion.getRol() != null) ? usuarioSesion.getRol().trim().toUpperCase() : "";
 %>
 
 <div class="modulo-container">
@@ -125,13 +129,20 @@
                                             // Normalizamos el texto quitando espacios fijos de la base de datos
                                             String est = (r.getEstado() != null) ? r.getEstado().trim().toUpperCase() : "";
 
+                                            // Solo puede cancelar: ADMIN_SISTEMA, o el residente dueño de la reserva
+                                            boolean esAdmin = rolUsuario.contains("ADMIN");
+                                            boolean esPropia = usuarioSesion != null && r.getUsuarioId() == usuarioSesion.getId();
+                                            boolean puedeCancelar = esAdmin || esPropia;
+
                                             // Lógica exclusiva para APROBADA
-                                            if ("APROBADA".equals(est)) {
+                                            if ("APROBADA".equals(est) && puedeCancelar) {
                                         %>
                                             <a href="${pageContext.request.contextPath}/reservas?accion=cancelar&id=<%= r.getId() %>"
                                                class="btn-cancelar-reserva"
                                                title="Cancelar Reserva"
                                                onclick="return confirm('¿Seguro que deseas cancelar esta reserva por completo? Esto liberará el turno.');">❌ Cancelar</a>
+                                        <% } else if ("APROBADA".equals(est)) { %>
+                                            <span class="texto-bloqueado">No autorizado</span>
                                         <% } else { %>
                                             <span class="texto-bloqueado">-</span>
                                         <% } %>

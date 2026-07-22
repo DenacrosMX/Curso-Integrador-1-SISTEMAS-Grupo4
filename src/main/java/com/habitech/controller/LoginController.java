@@ -20,7 +20,6 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Bloqueo de accesos manuales directos por URL a /auth, redirige al login
         response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
 
@@ -39,12 +38,9 @@ public class LoginController extends HttpServlet {
             HttpSession session = request.getSession(true);
             session.setAttribute("usuarioLogueado", usuarioAutenticado);
 
-            // SI LA CONTRASEÑA INTRODUCIDA ES LA DE DEFECTO, FORZAMOS EL RESETEO
             if ("123456".equals(passParam)) {
-                System.out.println("[Login] -> Usuario con clave inicial. Redirigiendo a reset de contraseña.");
                 response.sendRedirect(request.getContextPath() + "/cambiar-password.jsp");
             } else {
-                System.out.println("[Login] -> Usuario seguro. Redirigiendo al Dashboard...");
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             }
         } else {

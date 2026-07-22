@@ -18,8 +18,7 @@ public class IncidenciaDaoImpl implements IncidenciaDao {
 
     @Override
     public boolean insertar(Incidencia incidencia) {
-        String sql = "INSERT INTO incidencias (asignacion_id, conserje_id, titulo, descripcion, prioridad, estado) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO incidencias (asignacion_id, conserje_id, titulo, descripcion, prioridad, estado) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -130,7 +129,6 @@ public class IncidenciaDaoImpl implements IncidenciaDao {
         String estadoNorm = nuevoEstado.toUpperCase().trim();
         String sql;
 
-        // Si pasa a RESUELTO o ANULADO, inyectamos la estampa de tiempo actual en fecha_cierre
         if ("RESUELTO".equals(estadoNorm) || "ANULADO".equals(estadoNorm)) {
             sql = "UPDATE incidencias SET estado = ?, conserje_id = ?, fecha_cierre = CURRENT_TIMESTAMP WHERE id = ?";
         } else {

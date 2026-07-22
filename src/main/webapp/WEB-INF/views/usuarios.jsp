@@ -2,11 +2,8 @@
 <%@ page import="com.habitech.model.Usuario" %>
 <%@ page import="java.util.List" %>
 <%
-    // Detectamos si el controlador nos envió un usuario para editar
     Usuario usuarioEdit = (Usuario) request.getAttribute("usuarioSeleccionado");
     boolean esEdicion = (usuarioEdit != null);
-
-    // Obtenemos la lista de usuarios para el historial
     List<Usuario> listaUsuarios = (List<Usuario>) request.getAttribute("usuarios");
 %>
 
@@ -59,7 +56,7 @@
             <div class="form-acciones">
                 <button type="submit" class="btn-guardar"><%= esEdicion ? "Actualizar" : "Guardar Registro" %></button>
                 <% if(esEdicion) { %>
-                    <a href="${pageContext.request.contextPath}/usuarios" class="btn-cancelar">Cancelar Edición</a>
+                    <a href="${pageContext.request.contextPath}/dashboard?modulo=usuarios" class="btn-cancelar" style="text-decoration: none; display: inline-block; text-align: center;">Cancelar Edición</a>
                 <% } %>
             </div>
         </form>
@@ -96,6 +93,7 @@
                                 <td>
                                     <div class="acciones-flex">
                                         <a href="${pageContext.request.contextPath}/dashboard?modulo=usuarios&accion=editar&id=<%= u.getId() %>" class="btn-accion edit" title="Editar">✏️</a>
+                                        <a href="${pageContext.request.contextPath}/usuarios?accion=resetear&id=<%= u.getId() %>" class="btn-accion reset" title="Restablecer Contraseña" onclick="return confirm('¿Seguro que deseas restablecer la contraseña de este usuario a 123456?');">🔑</a>
                                         <a href="${pageContext.request.contextPath}/usuarios?accion=eliminar&id=<%= u.getId() %>" class="btn-accion delete" title="Desactivar" onclick="return confirm('¿Seguro que deseas desactivar este usuario?');">🗑️</a>
                                     </div>
                                 </td>

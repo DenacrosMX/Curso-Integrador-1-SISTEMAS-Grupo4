@@ -67,6 +67,7 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+    align-items: center;
 }
 
 .btn-guardar {
@@ -78,11 +79,15 @@
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 .btn-guardar:hover {
     background-color: #0369a1;
+}
+
+.btn-guardar:active {
+    transform: scale(0.98);
 }
 
 .btn-cancelar {
@@ -95,11 +100,19 @@
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    transition: background-color 0.2s;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.1s;
+    border: none;
+    cursor: pointer;
 }
 
 .btn-cancelar:hover {
     background-color: #334155;
+    color: #ffffff;
+}
+
+.btn-cancelar:active {
+    transform: scale(0.98);
 }
 
 /* --- ESTILOS DE LA TABLA DE HISTORIAL --- */
@@ -132,7 +145,7 @@
 }
 
 .tabla-usuarios tbody tr:hover {
-    background-color: #24334d; /* Sutil cambio al pasar el mouse por la fila */
+    background-color: #24334d;
 }
 
 /* Badges (Etiquetas de Rol y Estado) */
@@ -168,7 +181,7 @@
     font-size: 1.1rem;
     padding: 6px;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -176,6 +189,15 @@
 
 .btn-accion:hover {
     background-color: #334155;
+}
+
+/* Color distintivo suave para el botón de reseteo de llave al pasar el cursor */
+.btn-accion.reset:hover {
+    background-color: rgba(234, 179, 8, 0.2);
+}
+
+.btn-accion:active {
+    transform: scale(0.9);
 }
 
 .text-center {

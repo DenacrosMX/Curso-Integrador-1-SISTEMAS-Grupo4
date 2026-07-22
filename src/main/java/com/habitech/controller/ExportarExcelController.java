@@ -36,10 +36,10 @@ public class ExportarExcelController extends HttpServlet {
             throws ServletException, IOException {
 
         String tipo = request.getParameter("tipo");
-        logger.info("Auditoría Logback: Solicitud de exportación Excel de tipo: {}", tipo);
+        logger.info("Solicitud de exportación Excel de tipo: {}", tipo);
 
         if (StringUtils.isBlank(tipo)) {
-            logger.warn("Se intentó invocar el servlet de exportación sin un parámetro de tipo válido.");
+            logger.warn("Parámetro 'tipo' faltante en la solicitud de exportación.");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parámetro 'tipo' faltante.");
             return;
         }
@@ -47,7 +47,7 @@ public class ExportarExcelController extends HttpServlet {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
         try (Workbook workbook = new XSSFWorkbook(); OutputStream out = response.getOutputStream()) {
-            Sheet sheet = workbook.createSheet("Datos Habitech Real");
+            Sheet sheet = workbook.createSheet("Datos Habitech");
 
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
@@ -83,12 +83,11 @@ public class ExportarExcelController extends HttpServlet {
                         fila.createCell(5).setCellValue(u.getEstado());
                     }
                 }
-                logger.info("Reporte POI finalizado: Se exportaron {} registros de usuarios.", numFila - 1);
+                logger.info("Exportados {} registros de usuarios correctamente.", numFila - 1);
 
             } else if ("asignaciones".equalsIgnoreCase(tipo)) {
                 response.setHeader("Content-Disposition", "attachment; filename=reporte_asignaciones.xlsx");
 
-                // Rediseño de cabeceras basadas en tu BD real (AsignacionDaoImpl)
                 ImmutableList<String> cabeceras = ImmutableList.of("ID Asignación", "Usuario Residente", "Infraestructura Base", "Código Unidad", "Tipo Adquisición", "Precio Pactado", "Estado");
                 Row rowCabecera = sheet.createRow(0);
                 for (int i = 0; i < cabeceras.size(); i++) {
@@ -103,24 +102,21 @@ public class ExportarExcelController extends HttpServlet {
                     for (Asignacion a : listaAsignaciones) {
                         Row fila = sheet.createRow(numFila++);
 
-                        // Inyección basada estrictamente en las columnas de tu ResultSet mapeado
                         fila.createCell(0).setCellValue(a.getId());
                         fila.createCell(1).setCellValue(a.getNombreUsuario());
                         fila.createCell(2).setCellValue(a.getDetalleInfraestructura());
-                        fila.createCell(3).setCellValue(a.getCodigoUnidadEspecifica()); // Código interno (Ej: "DEP-402")
+                        fila.createCell(3).setCellValue(a.getCodigoUnidad());
                         fila.createCell(4).setCellValue(a.getTipoAdquisicion());
 
-                        // Conversión segura para BigDecimals en celdas numéricas de Excel
                         double precio = (a.getPrecioMensualPactado() != null) ? a.getPrecioMensualPactado().doubleValue() : 0.0;
                         fila.createCell(5).setCellValue(precio);
 
                         fila.createCell(6).setCellValue(a.getEstado());
                     }
                 }
-                logger.info("Reporte POI finalizado: Se exportaron {} registros de asignaciones.", numFila - 1);
+                logger.info("Exportados {} registros de asignaciones correctamente.", numFila - 1);
             }
 
-            // Autoajustar el tamaño dinámico de las columnas (hasta 7 columnas para el módulo de asignaciones)
             for (int col = 0; col < 7; col++) {
                 sheet.autoSizeColumn(col);
             }
@@ -129,8 +125,8 @@ public class ExportarExcelController extends HttpServlet {
             out.flush();
 
         } catch (Exception e) {
-            logger.error("Error crítico durante la generación del libro binario Apache POI", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Excepción interna al procesar la descarga.");
+            logger.error("Error crítico durante la generación del libro Excel con Apache POI", e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno al generar la descarga.");
         }
     }
 

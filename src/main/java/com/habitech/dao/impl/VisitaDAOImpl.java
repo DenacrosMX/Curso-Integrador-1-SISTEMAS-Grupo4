@@ -63,9 +63,8 @@ public class VisitaDaoImpl implements VisitaDao {
     @Override
     public List<Visita> listarTodos() {
         List<Visita> lista = new ArrayList<>();
-        // COLUMNA CORREGIDA: u.nombres en lugar de u.nombre
         String sql = "SELECT v.*, " +
-                "       a.codigo_unidad_especifica, " +
+                "       a.codigo_unidad AS codigo_unidad_especifica, " +
                 "       i.tipo_elemento, i.torre, i.nro_piso, " +
                 "       u.nombres AS nombre_conserje " +
                 "FROM visitas v " +
@@ -92,16 +91,19 @@ public class VisitaDaoImpl implements VisitaDao {
                 v.setTipoIngreso(rs.getString("tipo_ingreso"));
 
                 Timestamp ingreso = rs.getTimestamp("fecha_hora_ingreso");
-                if (ingreso != null) v.setFechaHoraIngreso(ingreso.toLocalDateTime());
+                if (ingreso != null) {
+                    v.setFechaHoraIngreso(ingreso.toLocalDateTime());
+                }
 
                 Timestamp salida = rs.getTimestamp("fecha_hora_out");
-                if (salida != null) v.setFechaHoraOut(salida.toLocalDateTime());
+                if (salida != null) {
+                    v.setFechaHoraOut(salida.toLocalDateTime());
+                }
 
                 v.setEstado(rs.getString("estado"));
                 v.setCodigoUnidadEspecifica(rs.getString("codigo_unidad_especifica"));
                 v.setNombreConserje(rs.getString("nombre_conserje"));
 
-                // Formateamos el detalle de la infraestructura usando la lógica exacta de tu sistema
                 int piso = rs.getInt("nro_piso");
                 String textPiso = (piso < 0) ? "SÓTANO " + (piso * -1) : (piso == 0) ? "PLANTA BAJA" : "PISO " + piso;
                 String detalle = rs.getString("torre") + " - " + textPiso + " (" + rs.getString("tipo_elemento") + ")";

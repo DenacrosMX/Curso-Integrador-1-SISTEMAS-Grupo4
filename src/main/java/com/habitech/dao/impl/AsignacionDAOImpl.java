@@ -16,8 +16,7 @@ public class AsignacionDaoImpl implements AsignacionDao {
 
     @Override
     public boolean insertar(Asignacion asignacion) {
-        // Usa la columna exacta de tu BD: unidad_especifica_id
-        String sql = "INSERT INTO asignaciones (usuario_id, inventario_maestro_id, unidad_especifica_id, "
+        String sql = "INSERT INTO asignaciones (usuario_id, inventario_maestro_id, codigo_unidad, "
                 + "tipo_adquisicion, precio_mensual_pactado, estado, fecha_ingreso, fecha_salida) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = ConexionDB.getConnection();
@@ -25,11 +24,7 @@ public class AsignacionDaoImpl implements AsignacionDao {
 
             ps.setInt(1, asignacion.getUsuarioId());
             ps.setInt(2, asignacion.getInventarioMaestroId());
-
-            // Intenta parsear el código si viene como ID numérico desde la UI, sino busca el ID por texto
-            int unidadId = obtenerUnidadIdPorCodigoOTexto(con, asignacion.getCodigoUnidadEspecifica());
-            ps.setInt(3, unidadId);
-
+            ps.setString(3, asignacion.getCodigoUnidad());
             ps.setString(4, asignacion.getTipoAdquisicion());
             ps.setBigDecimal(5, asignacion.getPrecioMensualPactado());
             ps.setString(6, asignacion.getEstado() != null ? asignacion.getEstado() : "ACTIVO");
@@ -38,7 +33,7 @@ public class AsignacionDaoImpl implements AsignacionDao {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            logger.error("Error al insertar asignación en la base de datos", e);
+            logger.error("Error al insertar asignación", e);
             throw new RuntimeException(e);
         }
     }
@@ -46,12 +41,10 @@ public class AsignacionDaoImpl implements AsignacionDao {
     @Override
     public List<Asignacion> listarTodas() {
         List<Asignacion> lista = new ArrayList<>();
-        // INNER JOIN con la tabla unidades_especificas usando el ID correcto (ue.id)
-        String sql = "SELECT a.*, u.nombres AS nombre_usuario, i.tipo_elemento, i.torre, i.nro_piso, ue.codigo_unidad "
+        String sql = "SELECT a.*, u.nombres AS nombre_usuario, i.tipo_elemento, i.torre, i.nro_piso "
                 + "FROM asignaciones a "
                 + "INNER JOIN usuarios u ON a.usuario_id = u.id "
                 + "INNER JOIN inventario_maestro_infraestructura i ON a.inventario_maestro_id = i.id "
-                + "INNER JOIN unidades_especificas ue ON a.unidad_especifica_id = ue.id "
                 + "ORDER BY a.estado ASC, a.id DESC";
 
         try (Connection con = ConexionDB.getConnection();
@@ -59,22 +52,20 @@ public class AsignacionDaoImpl implements AsignacionDao {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Asignacion a = mappearAsignacion(rs);
-                lista.add(a);
+                lista.add(mappearAsignacion(rs));
             }
         } catch (SQLException e) {
-            logger.error("Error al listar todas las asignaciones", e);
+            logger.error("Error al listar asignaciones", e);
         }
         return lista;
     }
 
     @Override
     public Asignacion obtenerPorId(int id) {
-        String sql = "SELECT a.*, u.nombres AS nombre_usuario, i.tipo_elemento, i.torre, i.nro_piso, ue.codigo_unidad "
+        String sql = "SELECT a.*, u.nombres AS nombre_usuario, i.tipo_elemento, i.torre, i.nro_piso "
                 + "FROM asignaciones a "
                 + "INNER JOIN usuarios u ON a.usuario_id = u.id "
                 + "INNER JOIN inventario_maestro_infraestructura i ON a.inventario_maestro_id = i.id "
-                + "INNER JOIN unidades_especificas ue ON a.unidad_especifica_id = ue.id "
                 + "WHERE a.id = ?";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -86,7 +77,7 @@ public class AsignacionDaoImpl implements AsignacionDao {
                 }
             }
         } catch (SQLException e) {
-            logger.error("Error al buscar asignación por ID: {}", id, e);
+            logger.error("Error al obtener asignación por ID", e);
         }
         return null;
     }
@@ -94,17 +85,14 @@ public class AsignacionDaoImpl implements AsignacionDao {
     @Override
     public boolean actualizar(Asignacion asignacion) {
         String sql = "UPDATE asignaciones SET usuario_id = ?, inventario_maestro_id = ?, "
-                + "unidad_especifica_id = ?, tipo_adquisicion = ?, precio_mensual_pactado = ?, "
+                + "codigo_unidad = ?, tipo_adquisicion = ?, precio_mensual_pactado = ?, "
                 + "estado = ?, fecha_ingreso = ?, fecha_salida = ? WHERE id = ?";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, asignacion.getUsuarioId());
             ps.setInt(2, asignacion.getInventarioMaestroId());
-
-            int unidadId = obtenerUnidadIdPorCodigoOTexto(con, asignacion.getCodigoUnidadEspecifica());
-            ps.setInt(3, unidadId);
-
+            ps.setString(3, asignacion.getCodigoUnidad()); // Actualización manual directa
             ps.setString(4, asignacion.getTipoAdquisicion());
             ps.setBigDecimal(5, asignacion.getPrecioMensualPactado());
             ps.setString(6, asignacion.getEstado());
@@ -114,7 +102,7 @@ public class AsignacionDaoImpl implements AsignacionDao {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            logger.error("Error al actualizar asignación con ID: {}", asignacion.getId(), e);
+            logger.error("Error al actualizar asignación", e);
             throw new RuntimeException(e);
         }
     }
@@ -137,10 +125,7 @@ public class AsignacionDaoImpl implements AsignacionDao {
         a.setId(rs.getInt("id"));
         a.setUsuarioId(rs.getInt("usuario_id"));
         a.setInventarioMaestroId(rs.getInt("inventario_maestro_id"));
-
-        // Asigna el código de la unidad obtenido desde la tabla unidades_especificas
-        a.setCodigoUnidadEspecifica(rs.getString("codigo_unidad"));
-
+        a.setCodigoUnidad(rs.getString("codigo_unidad"));
         a.setTipoAdquisicion(rs.getString("tipo_adquisicion"));
         a.setPrecioMensualPactado(rs.getBigDecimal("precio_mensual_pactado"));
         a.setEstado(rs.getString("estado"));
@@ -148,33 +133,11 @@ public class AsignacionDaoImpl implements AsignacionDao {
         a.setFechaSalida(rs.getDate("fecha_salida"));
         a.setNombreUsuario(rs.getString("nombre_usuario"));
 
-        // Cierre completo y correcto de la lógica de strings para evitar errores de sintaxis
         int piso = rs.getInt("nro_piso");
         String textPiso = (piso < 0) ? "SÓTANO " + (piso * -1) : (piso == 0) ? "PLANTA BAJA" : "PISO " + piso;
         String detalle = rs.getString("torre") + " - " + textPiso + " (" + rs.getString("tipo_elemento") + ")";
         a.setDetalleInfraestructura(detalle);
 
         return a;
-    }
-
-    // Método auxiliar para procesar el parámetro de la unidad de forma segura
-    private int obtenerUnidadIdPorCodigoOTexto(Connection con, String valor) throws SQLException {
-        if (valor == null || valor.trim().isEmpty()) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(valor.trim());
-        } catch (NumberFormatException e) {
-            String sql = "SELECT id FROM unidades_especificas WHERE codigo_unidad = ?";
-            try (PreparedStatement ps = con.prepareStatement(sql)) {
-                ps.setString(1, valor.toUpperCase().trim());
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getInt("id");
-                    }
-                }
-            }
-        }
-        return 0;
     }
 }

@@ -29,7 +29,6 @@ public class VisitaController extends HttpServlet {
             if (idStr != null) {
                 int id = Integer.parseInt(idStr);
 
-                // Procesamos las acciones directamente sin interceptar con bloqueos de rol molestos
                 if ("registrarSalida".equals(accion)) {
                     visitaDao.registrarSalida(id);
                 } else if ("anular".equals(accion)) {
@@ -38,7 +37,6 @@ public class VisitaController extends HttpServlet {
             }
         }
 
-        // Te devuelve de inmediato a la vista donde estabas parado
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=visitas");
     }
 
@@ -47,7 +45,6 @@ public class VisitaController extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        // Intentamos capturar el usuario, pero no bloqueamos el flujo si tiene otra clave de sesión
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
 
         try {
@@ -64,7 +61,6 @@ public class VisitaController extends HttpServlet {
             nuevaVisita.setPlacaVehiculo(placa != null ? placa.trim() : "");
             nuevaVisita.setTipoIngreso(tipo);
 
-            // Si tu sistema usa otra clave para el usuario, esto evita el NullPointerException
             if (usuarioLogueado != null) {
                 nuevaVisita.setConserjeId(usuarioLogueado.getId());
             } else {
@@ -77,7 +73,6 @@ public class VisitaController extends HttpServlet {
             request.getSession().setAttribute("alertaError", "Error al procesar el ingreso: " + e.getMessage());
         }
 
-        // Redirección limpia al panel para que veas tu registro inmediatamente insertado
         response.sendRedirect(request.getContextPath() + "/dashboard?modulo=visitas");
     }
 }

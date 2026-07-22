@@ -24,9 +24,11 @@
                     <select name="usuarioId" id="usuarioId" required class="form-control">
                         <option value="">-- Seleccione Habitante --</option>
                         <c:forEach var="usr" items="${usuarios}">
-                            <option value="${usr.id}" <c:if test="${asignacionSeleccionada.usuarioId == usr.id}">selected</c:if>>
-                                ${usr.nombres} (${usr.rol})
-                            </option>
+                            <c:if test="${usr.rol == 'RESIDENTE'}">
+                                <option value="${usr.id}" <c:if test="${asignacionSeleccionada.usuarioId == usr.id}">selected</c:if>>
+                                    ${usr.nombres} (${usr.rol})
+                                </option>
+                            </c:if>
                         </c:forEach>
                     </select>
                 </div>
@@ -34,7 +36,7 @@
                 <%-- Selector de Infraestructura Base --%>
                 <div class="form-group col-4">
                     <label for="inventarioMaestroId">Estructura Base</label>
-                    <select name="inventarioMaestroId" id="inventarioMaestroId" required class="form-control" onchange="cargarUnidadesEspecificas(this.value)">
+                    <select name="inventarioMaestroId" id="inventarioMaestroId" required class="form-control">
                         <option value="">-- Seleccione Bloque --</option>
                         <c:forEach var="inf" items="${inventario}">
                             <option value="${inf.id}" <c:if test="${asignacionSeleccionada.inventarioMaestroId == inf.id}">selected</c:if>>
@@ -50,17 +52,12 @@
                     </select>
                 </div>
 
-                <%-- Código Específico de Unidad (MODIFICADO A ID) --%>
+                <%-- Código Específico de Unidad (CAMBIADO A ENTRADA DE TEXTO MANUAL) --%>
                 <div class="form-group col-4">
-                    <label for="codigoUnidadSpecificas">Código de Unidad Específica</label>
-                    <select name="unidadEspecificaId" id="codigoUnidadSpecificas" required class="form-control">
-                        <option value="">-- Seleccione Código --</option>
-                        <c:if test="${not empty asignacionSeleccionada}">
-                            <option value="${asignacionSeleccionada.unidadEspecificaId}" selected>
-                                ${asignacionSeleccionada.codigoUnidadEspecifica}
-                            </option>
-                        </c:if>
-                    </select>
+                    <label for="codigoUnidadEspecifica">Código de Unidad Específica</label>
+                    <input type="text" name="codigoUnidadEspecifica" id="codigoUnidadEspecifica"
+                           placeholder="Ej: DPTO A-201, COCHERA-P2-01" required class="form-control"
+                           value="${not empty asignacionSeleccionada ? asignacionSeleccionada.codigoUnidad : ''}">
                 </div>
             </div>
 
@@ -86,7 +83,7 @@
                 <div class="form-group col-4">
                     <label for="fechaIngreso">Fecha de Ingreso / Contrato</label>
                     <input type="date" name="fechaIngreso" id="fechaIngreso"
-                           value="${not empty asignacionSeleccionada ? asignacionSeleccionada.fechaIngreso : '2026-06-07'}" required class="form-control">
+                           value="${not empty asignacionSeleccionada ? asignacionSeleccionada.fechaIngreso : '2026-07-14'}" required class="form-control">
                 </div>
             </div>
 
@@ -130,7 +127,7 @@
                                 <td>${asig.id}</td>
                                 <td class="text-bold">${asig.nombreUsuario}</td>
                                 <td>${asig.detalleInfraestructura}</td>
-                                <td><span class="badge-cantidad">${asig.codigoUnidadEspecifica}</span></td>
+                                <td><span class="badge-cantidad">${asig.codigoUnidad}</span></td>
                                 <td><span class="badge-tipo">${asig.tipoAdquisicion}</span></td>
                                 <td class="text-bold">S/. ${asig.precioMensualPactado}</td>
                                 <td>${asig.fechaIngreso}</td>
@@ -162,7 +159,7 @@
                     </c:when>
                     <c:otherwise>
                         <tr>
-                            <td colspan="10" class="tabla-vacia">No existen asignaciones de unidades registradas in el sistema.</td>
+                            <td colspan="10" class="tabla-vacia">No existen asignaciones de unidades registradas en el sistema.</td>
                         </tr>
                     </c:otherwise>
                 </c:choose>
@@ -171,42 +168,3 @@
     </div>
 
 </div>
-
-<%-- SCRIPT AJAX ASÍNCRONO PARA LA INTERACTIVIDAD --%>
-<script>
-function cargarUnidadesEspecificas(infraestructuraId) {
-    const selectUnidad = document.getElementById("codigoUnidadSpecificas");
-
-    selectUnidad.innerHTML = '<option value="">-- Seleccione Código --</option>';
-
-    if (!infraestructuraId) return;
-
-    const url = `${pageContext.request.contextPath}/api/unidades-disponibles?infraestructuraId=${infraestructuraId}`;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error("Error en la respuesta de red");
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.length > 0) {
-                data.forEach(unidad => {
-                    const option = document.createElement("option");
-                    option.value = unidad.id; // Modificado: Envía el ID numérico
-                    option.textContent = unidad.codigoUnidad; // Muestra la etiqueta de texto legible
-                    selectUnidad.appendChild(option);
-                });
-            } else {
-                const option = document.createElement("option");
-                option.value = "";
-                option.textContent = "⚠️ No hay unidades disponibles";
-                option.disabled = true;
-                selectUnidad.appendChild(option);
-            }
-        })
-        .catch(error => {
-            console.error("Error cargando unidades específicas:", error);
-            selectUnidad.innerHTML = '<option value="">⚠️ Error al cargar elementos</option>';
-        });
-}
-</script>

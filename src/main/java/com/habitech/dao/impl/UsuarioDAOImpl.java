@@ -64,15 +64,13 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
     @Override
     public Usuario obtenerPorId(int id) {
-        Usuario u = null;
         String sql = "SELECT * FROM usuarios WHERE id = ?";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    u = new Usuario();
+                    Usuario u = new Usuario();
                     u.setId(rs.getInt("id"));
                     u.setUsername(rs.getString("username"));
                     u.setPassword(rs.getString("password"));
@@ -82,17 +80,18 @@ public class UsuarioDaoImpl implements UsuarioDao {
                     u.setTelefono(rs.getString("telefono"));
                     u.setRol(rs.getString("rol"));
                     u.setEstado(rs.getString("estado"));
+                    return u;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return u;
+        return null;
     }
 
     @Override
     public boolean actualizar(Usuario usuario) {
-        String sql = "UPDATE usuarios SET username = ?, nombres = ?, apellidos = ?, email = ?, telefono = ?, rol = ? WHERE id = ?";
+        String sql = "UPDATE usuarios SET username=?, nombres=?, apellidos=?, email=?, telefono=?, rol=? WHERE id=?";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -116,7 +115,6 @@ public class UsuarioDaoImpl implements UsuarioDao {
         String sql = "UPDATE usuarios SET estado = 'INACTIVO' WHERE id = ?";
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -125,11 +123,22 @@ public class UsuarioDaoImpl implements UsuarioDao {
         }
     }
 
-    // METODO DE AUTENTICACION COMPLETO Y SEGURO PARA PRODUCCIÓN
+    public boolean restablecerContrasena(int idUsuario, String nuevoHash) {
+        String sql = "UPDATE usuarios SET password = ? WHERE id = ?";
+        try (Connection con = ConexionDB.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nuevoHash);
+            ps.setInt(2, idUsuario);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     @Override
     public Usuario validarLogin(String username, String passwordPlano) {
         String sql = "SELECT * FROM usuarios WHERE username = ? AND estado = 'ACTIVO'";
-
         try (Connection con = ConexionDB.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -138,16 +147,11 @@ public class UsuarioDaoImpl implements UsuarioDao {
                 if (rs.next()) {
                     String hashGuardado = rs.getString("password");
 
-                    // Verificar que el hash almacenado sea un hash BCrypt válido
-                    if (hashGuardado == null || !hashGuardado.startsWith("$2")) {
-                        System.out.println("[Login] ERROR -> La contraseña del usuario '" + username
-                                + "' no es un hash BCrypt válido. Fue insertada en texto plano.");
+                    if (hashGuardado == null || !hashGuardado.startsWith("$2a$")) {
                         return null;
                     }
 
-                    // Compara directamente usando la librería BCrypt de forma limpia
                     if (BCrypt.checkpw(passwordPlano, hashGuardado)) {
-
                         Usuario u = new Usuario();
                         u.setId(rs.getInt("id"));
                         u.setUsername(rs.getString("username"));
@@ -158,15 +162,10 @@ public class UsuarioDaoImpl implements UsuarioDao {
                         u.setRol(rs.getString("rol"));
                         u.setEstado(rs.getString("estado"));
                         return u;
-                    } else {
-                        System.out.println("[Login] -> Contraseña incorrecta para usuario: " + username);
                     }
-                } else {
-                    System.out.println("[Login] -> Usuario no encontrado o INACTIVO: " + username);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("[Login] ERROR SQL -> " + e.getMessage());
             e.printStackTrace();
         }
         return null;
